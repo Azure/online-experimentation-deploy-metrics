@@ -1,0 +1,321 @@
+{
+  "schemaVersion": "1.0",
+  "metrics": [
+    {
+      "id": "count_chat_api_calls",
+      "displayName": "Number of chat GenAI calls",
+      "description": "The number of chat GenAI calls. Measured by spans with genai.operation.name equal to chat.",
+      "lifecycle": "Active",
+      "tags": ["GenAI"],
+      "desiredDirection": "Increase",
+      "definition": {
+        "kind": "EventCount",
+        "event": {
+          "eventName": "_gen_ai_chat"
+        }
+      }
+    },
+    {
+      "id": "sum_used_chat_tokens",
+      "displayName": "Total Chat Usage Tokens",
+      "description": "The total usage tokens (both input and output). Assuming equal # of chat calls, we want total token usage to reduce or remain constant. The statistical test on this metric compares the token usage per event: meaning increased usage may increase the total usage tokens without highlighting this metric.",
+      "lifecycle": "Active",
+      "tags": ["GenAI", "Important"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Sum",
+        "value": {
+          "eventName": "_gen_ai_chat",
+          "eventProperty": "gen_ai.usage.custom.io_tokens"
+        }
+      }
+    },
+    {
+      "id": "avg_chat_call_duration",
+      "displayName": "Average duration of chat API per call [ms]",
+      "description": "The average duration in milliseconds per chat operation. Duration is measured by the DurationMS property of the span capturing chat API call.",
+      "lifecycle": "Active",
+      "tags": ["GenAI", "Performance"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Average",
+        "value": {
+          "eventName": "_gen_ai_chat",
+          "eventProperty": "DurationMS",
+          "filter": "DurationMS > 0"
+        }
+      }
+    },
+    {
+      "id": "rate_chat_error",
+      "displayName": "Chat error rate",
+      "description": "The percentage of chat API calls that throw an error. This metric is calculated as the number of chat API returns including an error of any type, divided by total number of chat API returns.",
+      "lifecycle": "Active",
+      "tags": ["GenAI", "Reliability"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "EventRate",
+        "event": {
+          "eventName": "_gen_ai_chat"
+        },
+        "condition": "['error.type'] != ''"
+      }
+    },
+    {
+      "id": "rate_tool_call",
+      "displayName": "GenAI Tool Call Rate",
+      "description": "The percentage of GenAI operations that performed at least one tool call. This metric is calculated as the number of chat API returns including at least one tool call message, divided by total number of chat API returns.",
+      "lifecycle": "Active",
+      "tags": ["GenAI"],
+      "desiredDirection": "Neutral",
+      "definition": {
+        "kind": "EventRate",
+        "event": {
+          "eventName": "_gen_ai_message_counts"
+        },
+        "condition": "['gen_ai.tool.message'] > 0"
+      }
+    },
+    {
+      "id": "rate_assistant_call",
+      "displayName": "GenAI Assistant Call Rate",
+      "description": "The percentage of GenAI operations that performed at least one assistant call. This metric is calculated as the number of GenAI API returns including at least one assistant call message, divided by total number of GenAI API returns.",
+      "lifecycle": "Active",
+      "tags": ["GenAI"],
+      "desiredDirection": "Neutral",
+      "definition": {
+        "kind": "EventRate",
+        "event": {
+          "eventName": "_gen_ai_message_counts"
+        },
+        "condition": "['gen_ai.assistant.message'] > 0"
+      }
+    },
+    {
+      "id": "count_genai_chat_calls_traceloop_open_ai",
+      "displayName": "Count chat calls -- OpenAI via Traceloop",
+      "description": "The number of chat OpenAI calls. Measured by the count of spans with Name==`openai.chat`. The default desired direction is specified as increase: appropriate for those looking to increase usage of chat features. However, this choice of direction is inappropriate if primary concern is cost, in which case the metric definition should be updated to specify `Decrease` as the desiredDirection.",
+      "lifecycle": "Active",
+      "tags": ["GenAI"],
+      "desiredDirection": "Increase",
+      "definition": {
+        "kind": "EventCount",
+        "event": {
+          "eventName": "openai.chat"
+        }
+      }
+    },
+    {
+      "id": "count_genai_chat_users_traceloop_open_ai",
+      "displayName": "Count chat users -- OpenAI via Traceloop",
+      "description": "The number of users with at least one OpenAI chat calls. This counts any user with a span with Name==`openai.chat`. The default desired direction is specified as increase: appropriate for those looking to increase usage of chat features.",
+      "lifecycle": "Active",
+      "tags": ["GenAI"],
+      "desiredDirection": "Increase",
+      "definition": {
+        "kind": "UserCount",
+        "event": {
+          "eventName": "openai.chat"
+        }
+      }
+    },
+    {
+      "id": "avg_genai_chat_tokens_traceloop_open_ai",
+      "displayName": "Average chat usage tokens -- OpenAI via Traceloop",
+      "description": "The average usage tokens (both input and output) per OpenAI chat call. Note that a single request may spark multiple OpenAI chat calls -- as when tool calls are initiated as part of the request. Each chat call contributes 1 vote to this metric. Assuming equal # of chat calls, we want total token usage to reduce or remain constant. Note: this is a normalization of the total token usage metric and so will have matching statistical significance.",
+      "lifecycle": "Active",
+      "tags": ["GenAI", "Important"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Average",
+        "value": {
+          "eventName": "openai.chat",
+          "eventProperty": "llm.usage.total_tokens"
+        }
+      }
+    },
+    {
+      "id": "sum_genai_chat_tokens_traceloop_open_ai",
+      "displayName": "Total chat usage tokens -- OpenAI via Traceloop",
+      "description": "The total usage tokens (both input and output) for OpenAI chat calls. Assuming equal # of chat calls, we want total token usage to reduce or remain constant. The statistical test on this metric compares the token usage per event: meaning increased usage may increase the total usage tokens without flagging this metric as statistically significant.",
+      "lifecycle": "Active",
+      "tags": ["GenAI"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Sum",
+        "value": {
+          "eventName": "openai.chat",
+          "eventProperty": "llm.usage.total_tokens"
+        }
+      }
+    },
+    {
+      "id": "avg_genai_chat_call_duration_traceloop_open_ai",
+      "displayName": "Average chat call duration [ms]  -- OpenAI via Traceloop",
+      "description": "The average duration in milliseconds per OpenAI chat operation. Duration is measured by the DurationMS property of the span capturing chat call completion.",
+      "lifecycle": "Active",
+      "tags": ["GenAI", "Performance"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Average",
+        "value": {
+          "eventName": "openai.chat",
+          "eventProperty": "DurationMS",
+          "filter": "DurationMS > 0"
+        }
+      }
+    },
+    {
+      "id": "count_genai_embedding_calls_traceloop_open_ai",
+      "displayName": "Count embedding calls -- OpenAI via Traceloop",
+      "description": "The number of embedding OpenAI calls. Measured by the count of spans with Name==`openai.embedding `. The default desired direction is specified as increase: appropriate for those looking to increase usage of embedding features. However, this choice of direction is inappropriate if primary concern is cost, in which case the metric definition should be updated to specify `Decrease` as the desiredDirection.",
+      "lifecycle": "Active",
+      "tags": ["GenAI"],
+      "desiredDirection": "Increase",
+      "definition": {
+        "kind": "EventCount",
+        "event": {
+          "eventName": "openai.embedding "
+        }
+      }
+    },
+    {
+      "id": "count_genai_embedding_users_traceloop_open_ai",
+      "displayName": "Count embedding users -- OpenAI via Traceloop",
+      "description": "The number of users with at least one OpenAI embedding calls. This counts any user with a span with Name==`openai.embedding `. The default desired direction is specified as increase: appropriate for those looking to increase usage of embedding features.",
+      "lifecycle": "Active",
+      "tags": ["GenAI"],
+      "desiredDirection": "Increase",
+      "definition": {
+        "kind": "UserCount",
+        "event": {
+          "eventName": "openai.embedding "
+        }
+      }
+    },
+    {
+      "id": "avg_genai_embedding_tokens_traceloop_open_ai",
+      "displayName": "Average embedding usage tokens -- OpenAI via Traceloop",
+      "description": "The average usage tokens (both input and output) per OpenAI embedding call. Note that a single request may spark multiple OpenAI embedding calls -- as when tool calls are initiated as part of the request. Each embedding call contributes 1 vote to this metric. Assuming equal # of embedding calls, we want total token usage to reduce or remain constant. Note: this is a normalization of the total token usage metric and so will have matching statistical significance.",
+      "lifecycle": "Active",
+      "tags": ["GenAI", "Important"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Average",
+        "value": {
+          "eventName": "openai.embedding ",
+          "eventProperty": "llm.usage.total_tokens"
+        }
+      }
+    },
+    {
+      "id": "sum_genai_embedding_tokens_traceloop_open_ai",
+      "displayName": "Total embedding usage tokens -- OpenAI via Traceloop",
+      "description": "The total usage tokens (both input and output) for OpenAI embedding calls. Assuming equal # of embedding calls, we want total token usage to reduce or remain constant. The statistical test on this metric compares the token usage per event: meaning increased usage may increase the total usage tokens without flagging this metric as statistically significant.",
+      "lifecycle": "Active",
+      "tags": ["GenAI"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Sum",
+        "value": {
+          "eventName": "openai.embedding ",
+          "eventProperty": "llm.usage.total_tokens"
+        }
+      }
+    },
+    {
+      "id": "avg_genai_embedding_call_duration_traceloop_open_ai",
+      "displayName": "Average embedding call duration [ms]  -- OpenAI via Traceloop",
+      "description": "The average duration in milliseconds per OpenAI embedding operation. Duration is measured by the DurationMS property of the span capturing embedding call completion.",
+      "lifecycle": "Active",
+      "tags": ["GenAI", "Performance"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Average",
+        "value": {
+          "eventName": "openai.embedding ",
+          "eventProperty": "DurationMS",
+          "filter": "DurationMS > 0"
+        }
+      }
+    },
+    {
+      "id": "count_genai_tool_call_calls_traceloop_open_ai",
+      "displayName": "Count tool calls -- OpenAI via Traceloop",
+      "description": "The number of tool calls within OpenAI calls. Measured by the count of spans with Name==`openai.chat` and filtered to ['gen_ai.completion.0.finish_reason']=='tool_calls'. The default desired direction is specified as increase: appropriate for those looking to increase usage of tool call features. However, this choice of direction is inappropriate if primary concern is cost, in which case the metric definition should be updated to specify `Decrease` as the desiredDirection.",
+      "lifecycle": "Active",
+      "tags": ["GenAI"],
+      "desiredDirection": "Increase",
+      "definition": {
+        "kind": "EventCount",
+        "event": {
+          "eventName": "openai.chat",
+          "filter": "['gen_ai.completion.0.finish_reason']=='tool_calls'"
+        }
+      }
+    },
+    {
+      "id": "count_genai_tool_call_users_traceloop_open_ai",
+      "displayName": "Count tool call users -- OpenAI via Traceloop",
+      "description": "The number of users with at least one OpenAI tool call. This counts any user with a span with Name==`openai.chat` and filtered to ['gen_ai.completion.0.finish_reason']=='tool_calls'. The default desired direction is specified as increase: appropriate for those looking to increase usage of tool call features.",
+      "lifecycle": "Active",
+      "tags": ["GenAI"],
+      "desiredDirection": "Increase",
+      "definition": {
+        "kind": "UserCount",
+        "event": {
+          "eventName": "openai.chat",
+          "filter": "['gen_ai.completion.0.finish_reason']=='tool_calls'"
+        }
+      }
+    },
+    {
+      "id": "avg_genai_tool_call_tokens_traceloop_open_ai",
+      "displayName": "Average tool call usage tokens -- OpenAI via Traceloop",
+      "description": "The average usage tokens (both input and output) per OpenAI tool call . Note that a single request may spark multiple OpenAI tool call s -- as when tool calls are initiated as part of the request. Each tool call  contributes 1 vote to this metric. Assuming equal # of tool call s, we want total token usage to reduce or remain constant. Note: this is a normalization of the total token usage metric and so will have matching statistical significance.",
+      "lifecycle": "Active",
+      "tags": ["GenAI", "Important"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Average",
+        "value": {
+          "eventName": "openai.chat",
+          "eventProperty": "llm.usage.total_tokens",
+          "filter": "['gen_ai.completion.0.finish_reason']=='tool_calls'"
+        }
+      }
+    },
+    {
+      "id": "sum_genai_tool_call_tokens_traceloop_open_ai",
+      "displayName": "Total tool call usage tokens -- OpenAI via Traceloop",
+      "description": "The total usage tokens for OpenAI tool calls. Assuming equal # of f calls, we want total token usage to reduce or remain constant. The statistical test on this metric compares the token usage per event: meaning increased usage may increase the total usage tokens without flagging this metric as statistically significant.",
+      "lifecycle": "Active",
+      "tags": ["GenAI"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Sum",
+        "value": {
+          "eventName": "openai.chat",
+          "eventProperty": "llm.usage.total_tokens",
+          "filter": "['gen_ai.completion.0.finish_reason']=='tool_calls'"
+        }
+      }
+    },
+    {
+      "id": "avg_genai_tool_call_call_duration_traceloop_open_ai",
+      "displayName": "Average tool call  duration [ms]  -- OpenAI via Traceloop",
+      "description": "The average duration in milliseconds per OpenAI tool call operation. Duration is measured by the DurationMS property of the span capturing tool call completion.",
+      "lifecycle": "Active",
+      "tags": ["GenAI", "Performance"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Average",
+        "value": {
+          "eventName": "openai.chat",
+          "eventProperty": "DurationMS",
+          "filter": "DurationMS > 0 and ['gen_ai.completion.0.finish_reason']=='tool_calls'"
+        }
+      }
+    }
+  ]
+}
