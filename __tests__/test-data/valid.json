@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0",
+  "metrics": [
+    {
+      "id": "avg_total_token_count",
+      "lifecycle": "Active",
+      "displayName": "Average total (prompt + response) token count per exchange",
+      "description": "Placeholder description",
+      "tags": ["Cost"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Average",
+        "value": {
+          "eventName": "ResponseReceived",
+          "eventProperty": "TotalTokenCount"
+        }
+      }
+    },
+    {
+      "id": "median_total_token_count",
+      "lifecycle": "Active",
+      "displayName": "Median total (prompt + response) token count per exchange",
+      "description": "Placeholder description",
+      "tags": ["Cost"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Percentile",
+        "value": {
+          "eventName": "ResponseReceived",
+          "eventProperty": "TotalTokenCount"
+        },
+        "percentile": 50
+      }
+    }
+  ]
+}
