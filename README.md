@@ -1,5 +1,8 @@
 # Online Experimentation Deploy Metrics
 
+> [!IMPORTANT] This GitHub Action is under beta release and is subject to the
+> [Azure AI Private Preview Terms - Online Experimentation](private-preview-terms.md).
+
 This action deploys metrics configuration file in the repository to an online
 experimentation workspace. This enables scenarios where the online
 experimentation workspace instance is automatically updated when changes are
@@ -84,7 +87,7 @@ jobs:
           enable-AzPSSession: true
 
       - name: Run Online Experimentation Deploy metrics
-        uses: azure/online-experimentation-deploy-metrics@v1
+        uses: azure/online-experimentation-deploy-metrics@v1-beta
         with:
           path: /path/to/metrics-config.json
           online-experimentation-workspace-id: 2a63a6cb-d7bb-4af7-ba92-8d1d7e6f091f
@@ -129,7 +132,7 @@ jobs:
           enable-AzPSSession: true
 
       - name: Run Online Experimentation deploy metrics
-        uses: azure/online-experimentation-deploy-metrics@v1
+        uses: azure/online-experimentation-deploy-metrics@v1-beta
         with:
           path: /path/to/metrics-config.json
           online-experimentation-workspace-id: 2a63a6cb-d7bb-4af7-ba92-8d1d7e6f091f
