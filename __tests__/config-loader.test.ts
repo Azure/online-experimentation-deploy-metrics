@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 import { loadConfigFiles } from '../src/config-loader'
 import { ArgumentError, ParseError } from '../src/errors'
 

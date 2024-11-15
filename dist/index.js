@@ -44086,6 +44086,8 @@ exports["default"] = _default;
 
 "use strict";
 
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -44174,6 +44176,8 @@ async function parseConfigFile(file) {
 
 "use strict";
 
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ValidationError = exports.ApiError = exports.ParseError = exports.ArgumentError = void 0;
 /**
@@ -44209,6 +44213,8 @@ exports.ValidationError = ValidationError;
 
 "use strict";
 
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -44296,6 +44302,8 @@ const getBooleanInput = (name, defaultValue) => {
 
 "use strict";
 
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -44350,6 +44358,8 @@ async function run() {
 
 "use strict";
 
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -70412,6 +70422,8 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 /**
  * The entrypoint for the action.
