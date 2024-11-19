@@ -61,15 +61,27 @@ export async function loadConfigFiles(inputPattern: string): Promise<Metric[]> {
     throw new ArgumentError(message)
   }
 
-  mergedMetrics.forEach(m => {
-    console.log(m)
-    const { errors, valid } = validator.validate(m, metricsSchema)
-    if (!valid) {
-      const message = `Schema validation failed for metric: ${m.id}. It should follow the schema defined in https://github.com/Azure/online-experimentation-deploy-metrics/tree/main/schema/Metrics.v1.0.0.schema.json. Error details: ${JSON.stringify(errors)}`
-      core.error(message)
-      throw new ArgumentError(message)
-    }
+  const schemaValidationResults = mergedMetrics.map(m => {
+    return { id: m.id, ...validator.validate(m, metricsSchema) }
   })
+
+  const failedValidations = schemaValidationResults.filter(
+    r => r.errors.length > 0
+  )
+
+  if (failedValidations.length > 0) {
+    const message = failedValidations
+      .map(r => {
+        const details = r.errors
+          .map(e => `${e.property}: ${e.message}`)
+          .join('\n')
+        return `Schema validation failed for metric: ${r.id}. It should follow the schema defined in the schema file https://github.com/Azure/online-experimentation-deploy-metrics/tree/main/schema/Metrics.v1.0.0.schema.json. Errors: ${details}`
+      })
+      .join('\n')
+
+    core.error(message)
+    throw new ArgumentError(message)
+  }
 
   core.info(`Found ${mergedMetrics.length} metrics in configuration files`)
   return mergedMetrics

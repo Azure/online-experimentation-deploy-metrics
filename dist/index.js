@@ -45994,15 +45994,22 @@ async function loadConfigFiles(inputPattern) {
         core.error(message);
         throw new errors_1.ArgumentError(message);
     }
-    mergedMetrics.forEach(m => {
-        console.log(m);
-        const { errors, valid } = validator.validate(m, Metrics_v1_0_0_schema_json_1.default);
-        if (!valid) {
-            const message = `Schema validation failed for metric: ${m.id}. It should follow the schema defined in https://github.com/Azure/online-experimentation-deploy-metrics/tree/main/schema/Metrics.v1.0.0.schema.json. Error details: ${JSON.stringify(errors)}`;
-            core.error(message);
-            throw new errors_1.ArgumentError(message);
-        }
+    const schemaValidationResults = mergedMetrics.map(m => {
+        return { id: m.id, ...validator.validate(m, Metrics_v1_0_0_schema_json_1.default) };
     });
+    const failedValidations = schemaValidationResults.filter(r => r.errors.length > 0);
+    if (failedValidations.length > 0) {
+        const message = failedValidations
+            .map(r => {
+            const details = r.errors
+                .map(e => `${e.property}: ${e.message}`)
+                .join('\n');
+            return `Schema validation failed for metric: ${r.id}. It should follow the schema defined in the schema file https://github.com/Azure/online-experimentation-deploy-metrics/tree/main/schema/Metrics.v1.0.0.schema.json. Errors: ${details}`;
+        })
+            .join('\n');
+        core.error(message);
+        throw new errors_1.ArgumentError(message);
+    }
     core.info(`Found ${mergedMetrics.length} metrics in configuration files`);
     return mergedMetrics;
 }
