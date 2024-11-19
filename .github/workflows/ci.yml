@@ -63,6 +63,6 @@ jobs:
         id: test-action
         uses: ./
         with:
-          path: 'metric-configs/*.json'
+          path: 'metric-configs/metrics-*.json'
           online-experimentation-workspace-id: e98f71db-9d99-4ba5-9b2e-a8f492cd9f62
           add-commit-hash-to-metric-description: false
