@@ -34,7 +34,7 @@ information, see the GitHub Help Documentation for
 
 ```yml
 path: |
-  /path/to/metrics-config*.json
+  /path/to/metrics-*.json
   !/path/to/metrics-config-ignore.json
 ```
 
