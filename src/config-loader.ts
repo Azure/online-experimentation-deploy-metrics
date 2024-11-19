@@ -6,6 +6,10 @@ import * as glob from '@actions/glob'
 import { ArgumentError, ParseError } from './errors'
 import * as fs from 'fs'
 import { Metric } from './models'
+import * as JsonValidator from 'jsonschema'
+import metricsSchema from '../schema/Metrics.v1.0.0.schema.json'
+
+const validator = new JsonValidator.Validator()
 
 export async function loadConfigFiles(inputPattern: string): Promise<Metric[]> {
   core.info('Loading configuration files from: ' + inputPattern)
@@ -53,6 +57,28 @@ export async function loadConfigFiles(inputPattern: string): Promise<Metric[]> {
   if (duplicates.length > 0) {
     const duplicateIds = duplicates.map(metric => metric.id).join(', ')
     const message = `Metric is defined multiple times which is not allowed: ${duplicateIds}`
+    core.error(message)
+    throw new ArgumentError(message)
+  }
+
+  const schemaValidationResults = mergedMetrics.map(m => {
+    return { id: m.id, ...validator.validate(m, metricsSchema) }
+  })
+
+  const failedValidations = schemaValidationResults.filter(
+    r => r.errors.length > 0
+  )
+
+  if (failedValidations.length > 0) {
+    const message = failedValidations
+      .map(r => {
+        const details = r.errors
+          .map(e => `${e.property}: ${e.message}`)
+          .join('\n')
+        return `Schema validation failed for metric: ${r.id}. It should follow the schema defined in the schema file https://github.com/Azure/online-experimentation-deploy-metrics/tree/main/schema/Metrics.v1.0.0.schema.json. Errors: ${details}`
+      })
+      .join('\n')
+
     core.error(message)
     throw new ArgumentError(message)
   }

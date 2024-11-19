@@ -1,0 +1,267 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "A Metric object that describes the metric.",
+  "required": [
+    "id",
+    "lifecycle",
+    "displayName",
+    "description",
+    "tags",
+    "desiredDirection",
+    "definition"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50,
+      "pattern": "^[a-z_][a-z0-9_]*$",
+      "description": "An ID used to uniquely identify and reference the metric.",
+      "readOnly": true
+    },
+    "lifecycle": {
+      "description": "The stage in the metric lifecycle, which determines when the metric is calculated.",
+      "type": "string",
+      "enum": ["Active", "Inactive"]
+    },
+    "displayName": {
+      "type": "string",
+      "description": "A display name for the metric to use for display rather than the ID.",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "description": "A description of the metric.",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "tags": {
+      "type": "array",
+      "description": "The tags of the metric.",
+      "items": {
+        "type": "string",
+        "description": "A tag attached to the metric.",
+        "minLength": 1,
+        "maxLength": 30,
+        "pattern": "^[a-zA-Z0-9 _:()&-]+$"
+      }
+    },
+    "desiredDirection": {
+      "description": "Whether an increase or decrease to the metric value is desired.",
+      "type": "string",
+      "enum": ["Increase", "Decrease", "Neutral"]
+    },
+    "definition": {
+      "$ref": "#/definitions/MetricDefinition"
+    }
+  },
+  "definitions": {
+    "EventCountDefinition": {
+      "type": "object",
+      "description": "The definition of an EventCount metric. This metric kind counts the observations of an event. Experiment analysis accounts for unequal traffic allocation.",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["EventCount"],
+          "description": "The kind of metric."
+        },
+        "event": {
+          "$ref": "#/definitions/ObservedEvent",
+          "description": "Event to observe."
+        }
+      },
+      "required": ["event"]
+    },
+    "UserCountDefinition": {
+      "type": "object",
+      "description": "The definition of a UserCount metric. This metric kind counts the users who encounter an event. Experiment analysis accounts for unequal traffic allocation.",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["UserCount"],
+          "description": "The kind of metric."
+        },
+        "event": {
+          "$ref": "#/definitions/ObservedEvent",
+          "description": "Event to observe."
+        }
+      },
+      "required": ["event"]
+    },
+    "EventRateDefinition": {
+      "type": "object",
+      "required": ["kind", "event", "condition"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["EventRate"],
+          "description": "The kind of metric."
+        },
+        "event": {
+          "$ref": "#/definitions/ObservedEvent",
+          "description": "Event to observe as the rate denominator."
+        },
+        "condition": {
+          "$ref": "#/definitions/EventCondition",
+          "description": "The event contributes to the rate numerator if it satisfies this condition."
+        }
+      },
+      "description": "The definition of an EventRate metric. This metric kind counts the percentage of events that satisfy a condition."
+    },
+    "UserRateDefinition": {
+      "type": "object",
+      "required": ["kind", "startEvent", "endEvent"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["UserRate"],
+          "description": "The kind of metric."
+        },
+        "startEvent": {
+          "$ref": "#/definitions/ObservedEvent",
+          "description": "The start event to observe as the rate denominator."
+        },
+        "endEvent": {
+          "$ref": "#/definitions/ObservedEvent",
+          "description": "The end event to observe, which is a condition for the rate numerator."
+        }
+      },
+      "description": "The definition of a UserRate metric. This metric kind counts the percentage of users with the start event that then encounter the end event. The metric denominator counts the number of users who encounter the start event at least once. The metric numerator counts the number of users who encounter both the start and end events at least once. The computation is ordered, so the start event must occur before the end event."
+    },
+    "PercentileDefinition": {
+      "type": "object",
+      "required": ["kind", "value", "percentile"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["Percentile"],
+          "description": "The kind of metric."
+        },
+        "value": {
+          "$ref": "#/definitions/AggregatedValue",
+          "description": "The value to aggregate."
+        },
+        "percentile": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 0,
+          "exclusiveMinimum": true,
+          "maximum": 100,
+          "exclusiveMaximum": true,
+          "description": "The percentile to measure."
+        }
+      },
+      "description": "The definition of a Percentile metric. This metric kind measures the percentile of an event property."
+    },
+    "SumDefinition": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["Sum"],
+          "description": "The kind of metric."
+        },
+        "value": {
+          "$ref": "#/definitions/AggregatedValue",
+          "description": "The value to aggregate."
+        }
+      },
+      "description": "The definition of a Sum metric. This metric kind measures the sum of an event property. Experiment analysis accounts for unequal traffic allocation."
+    },
+    "AverageDefinition": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["Average"],
+          "description": "The kind of metric."
+        },
+        "value": {
+          "$ref": "#/definitions/AggregatedValue",
+          "description": "The value to aggregate."
+        }
+      },
+      "description": "The definition of an Average metric. This metric kind measures the average of an event property."
+    },
+    "ObservedEvent": {
+      "type": "object",
+      "description": "An event observed by a metric.",
+      "properties": {
+        "eventName": {
+          "type": "string",
+          "description": "The name of the event.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "filter": {
+          "$ref": "#/definitions/EventCondition",
+          "description": "[Optional] A condition to filter events."
+        }
+      },
+      "required": ["eventName"]
+    },
+    "EventCondition": {
+      "type": "string",
+      "description": "A condition to filter events. Accepts a Kusto Query Language (KQL) filter predicate. \nAllowed expressions evaluate to a bool data type and use a subset of KQL syntax:\nEvent properties: plain or bracket notation.\nLiterals: bool, long, real, string.\nComparison operators: ==, !=, <, <=, >, >=.\nBoolean operators: and, or.\nGrouping operations: parentheses.",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "AggregatedValue": {
+      "type": "object",
+      "required": ["eventName", "eventProperty"],
+      "properties": {
+        "eventName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "The name of the event."
+        },
+        "filter": {
+          "$ref": "#/definitions/EventCondition",
+          "description": "[Optional] A condition to filter events."
+        },
+        "eventProperty": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^[a-zA-Z0-9_ -.]+$",
+          "description": "The key of the event property to aggregate."
+        }
+      },
+      "description": "An event property value aggregated by a metric."
+    },
+    "MetricDefinition": {
+      "description": "The metric definition, which determines how the metric value is calculated from event data.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "EventCount",
+            "UserCount",
+            "EventRate",
+            "UserRate",
+            "Sum",
+            "Average",
+            "Percentile"
+          ],
+          "description": "Discriminator property for MetricDefinition."
+        }
+      },
+      "anyOf": [
+        { "$ref": "#/definitions/EventCountDefinition" },
+        { "$ref": "#/definitions/UserCountDefinition" },
+        { "$ref": "#/definitions/EventRateDefinition" },
+        { "$ref": "#/definitions/UserRateDefinition" },
+        { "$ref": "#/definitions/SumDefinition" },
+        { "$ref": "#/definitions/AverageDefinition" },
+        { "$ref": "#/definitions/PercentileDefinition" }
+      ],
+      "required": ["kind"]
+    }
+  }
+}
