@@ -25,8 +25,10 @@ describe('loadConfigFiles', () => {
     await expect(promise).rejects.toThrow(/Failed to parse:/)
   })
 
-  it('throw when json is not following schame', async () => {
-    const promise = loadConfigFiles(`${__dirname}/invalid-data/invalid2.json`)
+  it('throw when json is not following schema', async () => {
+    const promise = loadConfigFiles(
+      `${__dirname}/invalid-data/invalid-kind-enum.json`
+    )
 
     await expect(promise).rejects.toThrow(ArgumentError)
 
@@ -38,8 +40,10 @@ describe('loadConfigFiles', () => {
     )
   })
 
-  it('throw when json is not following schame - percentile is not provided', async () => {
-    const promise = loadConfigFiles(`${__dirname}/invalid-data/invalid3.json`)
+  it('throw when json is not following schema - percentile is not provided', async () => {
+    const promise = loadConfigFiles(
+      `${__dirname}/invalid-data/invalid-percentile.json`
+    )
 
     await expect(promise).rejects.toThrow(ArgumentError)
 
