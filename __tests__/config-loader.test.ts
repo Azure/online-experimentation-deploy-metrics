@@ -19,10 +19,33 @@ describe('loadConfigFiles', () => {
   })
 
   it('throw when config format is invalid', async () => {
-    const promise = loadConfigFiles(`${__dirname}/invalid-data/*.json`)
+    const promise = loadConfigFiles(`${__dirname}/invalid-data/invalid.json`)
 
     await expect(promise).rejects.toThrow(ParseError)
     await expect(promise).rejects.toThrow(/Failed to parse:/)
+  })
+
+  it('throw when json is not following schame', async () => {
+    const promise = loadConfigFiles(`${__dirname}/invalid-data/invalid2.json`)
+
+    await expect(promise).rejects.toThrow(ArgumentError)
+
+    await expect(promise).rejects.toThrow(
+      /Schema validation failed for metric: avg_total_token_count. It should follow the schema defined/
+    )
+    await expect(promise).rejects.toThrow(
+      /is not one of enum values: EventCount,UserCount,EventRate,UserRate,Sum,Average,Percentile/
+    )
+  })
+
+  it('throw when json is not following schame - percentile is not provided', async () => {
+    const promise = loadConfigFiles(`${__dirname}/invalid-data/invalid3.json`)
+
+    await expect(promise).rejects.toThrow(ArgumentError)
+
+    await expect(promise).rejects.toThrow(
+      /Schema validation failed for metric: median_total_token_count. It should follow the schema defined/
+    )
   })
 
   it('Read file correctly', async () => {

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0",
+  "metrics": [
+    {
+      "id": "median_total_token_count",
+      "lifecycle": "Active",
+      "displayName": "Median total (prompt + response) token count per exchange",
+      "description": "Placeholder description",
+      "tags": ["Cost"],
+      "desiredDirection": "Decrease",
+      "definition": {
+        "kind": "Percentile",
+        "value": {
+          "eventName": "ResponseReceived",
+          "eventProperty": "TotalTokenCount"
+        }
+      }
+    }
+  ]
+}

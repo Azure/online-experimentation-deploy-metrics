@@ -6,6 +6,10 @@ import * as glob from '@actions/glob'
 import { ArgumentError, ParseError } from './errors'
 import * as fs from 'fs'
 import { Metric } from './models'
+import * as JsonValidator from 'jsonschema'
+import metricsSchema from '../schema/Metrics.v1.0.0.schema.json'
+
+const validator = new JsonValidator.Validator()
 
 export async function loadConfigFiles(inputPattern: string): Promise<Metric[]> {
   core.info('Loading configuration files from: ' + inputPattern)
@@ -56,6 +60,16 @@ export async function loadConfigFiles(inputPattern: string): Promise<Metric[]> {
     core.error(message)
     throw new ArgumentError(message)
   }
+
+  mergedMetrics.forEach(m => {
+    console.log(m)
+    const { errors, valid } = validator.validate(m, metricsSchema)
+    if (!valid) {
+      const message = `Schema validation failed for metric: ${m.id}. It should follow the schema defined in https://github.com/Azure/online-experimentation-deploy-metrics/tree/main/schema/Metrics.v1.0.0.schema.json. Error details: ${JSON.stringify(errors)}`
+      core.error(message)
+      throw new ArgumentError(message)
+    }
+  })
 
   core.info(`Found ${mergedMetrics.length} metrics in configuration files`)
   return mergedMetrics
