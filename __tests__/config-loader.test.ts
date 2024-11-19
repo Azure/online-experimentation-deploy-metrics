@@ -52,6 +52,21 @@ describe('loadConfigFiles', () => {
     )
   })
 
+  it('throw when json is not following schema - kind is provided but other fields like event are not provided', async () => {
+    const promise = loadConfigFiles(
+      `${__dirname}/invalid-data/invalid-definition-without-event.json`
+    )
+
+    await expect(promise).rejects.toThrow(ArgumentError)
+
+    await expect(promise).rejects.toThrow(
+      /Schema validation failed for metric: avg_total_token_count. It should follow the schema defined in the schema file/
+    )
+    await expect(promise).rejects.toThrow(
+      /Errors: instance.definition: is not any of <#\/definitions\/EventCountDefinition>,<#\/definitions\/UserCountDefinition>,<#\/definitions\/EventRateDefinition>,<#\/definitions\/UserRateDefinition>,<#\/definitions\/SumDefinition>,<#\/definitions\/AverageDefinition>,<#\/definitions\/PercentileDefinition>/
+    )
+  })
+
   it('Read file correctly', async () => {
     const result = await loadConfigFiles(`${__dirname}/test-data/valid.json`)
     expect(result.length).toBe(2)
