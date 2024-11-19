@@ -23,23 +23,7 @@
     "lifecycle": {
       "description": "The stage in the metric lifecycle, which determines when the metric is calculated.",
       "type": "string",
-      "enum": ["Active", "Inactive"],
-      "x-ms-enum": {
-        "name": "LifecycleStage",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "Active",
-            "value": "Active",
-            "description": "Metric is included in experiment analysis"
-          },
-          {
-            "name": "Inactive",
-            "value": "Inactive",
-            "description": "Metric is not included in experiment analysis"
-          }
-        ]
-      }
+      "enum": ["Active", "Inactive"]
     },
     "displayName": {
       "type": "string",
@@ -67,28 +51,7 @@
     "desiredDirection": {
       "description": "Whether an increase or decrease to the metric value is desired.",
       "type": "string",
-      "enum": ["Increase", "Decrease", "Neutral"],
-      "x-ms-enum": {
-        "name": "DesiredDirection",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "Increase",
-            "value": "Increase",
-            "description": "An increase to the metric value is desired. E.g., Success rate, Total revenue."
-          },
-          {
-            "name": "Decrease",
-            "value": "Decrease",
-            "description": "A decrease to the metric value is desired. E.g., Error rate, Latency."
-          },
-          {
-            "name": "Neutral",
-            "value": "Neutral",
-            "description": "Neither an increase nor a decrease to the metric value is desired, or the desired direction depends on other factors. E.g., Number of video play attempts, Number of user feedbacks"
-          }
-        ]
-      }
+      "enum": ["Increase", "Decrease", "Neutral"]
     },
     "definition": {
       "$ref": "#/definitions/MetricDefinition"
@@ -99,25 +62,33 @@
       "type": "object",
       "description": "The definition of an EventCount metric. This metric kind counts the observations of an event. Experiment analysis accounts for unequal traffic allocation.",
       "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["EventCount"],
+          "description": "The kind of metric."
+        },
         "event": {
           "$ref": "#/definitions/ObservedEvent",
           "description": "Event to observe."
         }
       },
-      "required": ["event"],
-      "x-ms-discriminator-value": "EventCount"
+      "required": ["event"]
     },
     "UserCountDefinition": {
       "type": "object",
       "description": "The definition of a UserCount metric. This metric kind counts the users who encounter an event. Experiment analysis accounts for unequal traffic allocation.",
       "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["UserCount"],
+          "description": "The kind of metric."
+        },
         "event": {
           "$ref": "#/definitions/ObservedEvent",
           "description": "Event to observe."
         }
       },
-      "required": ["event"],
-      "x-ms-discriminator-value": "UserCount"
+      "required": ["event"]
     },
     "EventRateDefinition": {
       "type": "object",
@@ -129,19 +100,11 @@
           "description": "The kind of metric."
         },
         "event": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/ObservedEvent"
-            }
-          ],
+          "$ref": "#/definitions/ObservedEvent",
           "description": "Event to observe as the rate denominator."
         },
         "condition": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/EventCondition"
-            }
-          ],
+          "$ref": "#/definitions/EventCondition",
           "description": "The event contributes to the rate numerator if it satisfies this condition."
         }
       },
@@ -157,19 +120,11 @@
           "description": "The kind of metric."
         },
         "startEvent": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/ObservedEvent"
-            }
-          ],
+          "$ref": "#/definitions/ObservedEvent",
           "description": "The start event to observe as the rate denominator."
         },
         "endEvent": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/ObservedEvent"
-            }
-          ],
+          "$ref": "#/definitions/ObservedEvent",
           "description": "The end event to observe, which is a condition for the rate numerator."
         }
       },
@@ -185,11 +140,7 @@
           "description": "The kind of metric."
         },
         "value": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/AggregatedValue"
-            }
-          ],
+          "$ref": "#/definitions/AggregatedValue",
           "description": "The value to aggregate."
         },
         "percentile": {
@@ -214,11 +165,7 @@
           "description": "The kind of metric."
         },
         "value": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/AggregatedValue"
-            }
-          ],
+          "$ref": "#/definitions/AggregatedValue",
           "description": "The value to aggregate."
         }
       },
@@ -234,11 +181,7 @@
           "description": "The kind of metric."
         },
         "value": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/AggregatedValue"
-            }
-          ],
+          "$ref": "#/definitions/AggregatedValue",
           "description": "The value to aggregate."
         }
       },
@@ -278,11 +221,7 @@
           "description": "The name of the event."
         },
         "filter": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/EventCondition"
-            }
-          ],
+          "$ref": "#/definitions/EventCondition",
           "description": "[Optional] A condition to filter events."
         },
         "eventProperty": {
@@ -313,40 +252,14 @@
           "description": "Discriminator property for MetricDefinition."
         }
       },
-      "discriminator": {
-        "propertyName": "kind",
-        "mapping": {
-          "EventCount": "#/definitions/EventCountDefinition",
-          "UserCount": "#/definitions/UserCountDefinition",
-          "EventRate": "#/definitions/EventRateDefinition",
-          "UserRate": "#/definitions/UserRateDefinition",
-          "Sum": "#/definitions/SumDefinition",
-          "Average": "#/definitions/AverageDefinition",
-          "Percentile": "#/definitions/PercentileDefinition"
-        }
-      },
       "anyOf": [
-        {
-          "$ref": "#/definitions/EventCountDefinition"
-        },
-        {
-          "$ref": "#/definitions/UserCountDefinition"
-        },
-        {
-          "$ref": "#/definitions/EventRateDefinition"
-        },
-        {
-          "$ref": "#/definitions/UserRateDefinition"
-        },
-        {
-          "$ref": "#/definitions/SumDefinition"
-        },
-        {
-          "$ref": "#/definitions/AverageDefinition"
-        },
-        {
-          "$ref": "#/definitions/PercentileDefinition"
-        }
+        { "$ref": "#/definitions/EventCountDefinition" },
+        { "$ref": "#/definitions/UserCountDefinition" },
+        { "$ref": "#/definitions/EventRateDefinition" },
+        { "$ref": "#/definitions/UserRateDefinition" },
+        { "$ref": "#/definitions/SumDefinition" },
+        { "$ref": "#/definitions/AverageDefinition" },
+        { "$ref": "#/definitions/PercentileDefinition" }
       ],
       "required": ["kind"]
     }
