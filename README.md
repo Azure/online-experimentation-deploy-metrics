@@ -52,7 +52,7 @@ path: |
 ### Example workflow
 
 The following example updates the Online Experimentation workspace instance each
-time a change is made to deploy `metrics-config.json` in the repository.
+time a change is made to deploy `metrics-*.json` in the repository.
 
 ```yaml
 on:
@@ -89,7 +89,7 @@ jobs:
       - name: Run Online Experimentation Deploy metrics
         uses: azure/online-experimentation-deploy-metrics@v1-beta
         with:
-          path: /path/to/metrics-config.json
+          path: /path/to/metrics-*.json
           online-experimentation-workspace-id: 2a63a6cb-d7bb-4af7-ba92-8d1d7e6f091f
           operation: deploy
           strict: true
@@ -134,7 +134,7 @@ jobs:
       - name: Run Online Experimentation deploy metrics
         uses: azure/online-experimentation-deploy-metrics@v1-beta
         with:
-          path: /path/to/metrics-config.json
+          path: /path/to/metrics-*.json
           online-experimentation-workspace-id: 2a63a6cb-d7bb-4af7-ba92-8d1d7e6f091f
           operation: validate
 ```
