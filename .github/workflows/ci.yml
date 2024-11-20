@@ -64,5 +64,7 @@ jobs:
         uses: ./
         with:
           path: 'metric-configs/metrics-*.json'
-          online-experimentation-workspace-id: e98f71db-9d99-4ba5-9b2e-a8f492cd9f62
+          online-experimentation-workspace-id:
+            ${{ vars.ONLINE_EXPERIMENTATION_WORKSPACE_ID }}
           add-commit-hash-to-metric-description: false
+          strict: false

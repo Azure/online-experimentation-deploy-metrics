@@ -46313,7 +46313,7 @@ async function createOrUpdateMetric(input, metric, accessToken) {
     };
     const { id, ...metricBody } = metric;
     if (addCommitShaToDescription) {
-        metricBody.description = `${metricBody.description} - ${githubSha}`;
+        metricBody.description = `${metricBody.description} Commit hash: ${githubSha}`;
     }
     const response = await axios_1.default.patch(url, metricBody, { headers });
     return {
