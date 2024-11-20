@@ -118,7 +118,7 @@ async function createOrUpdateMetric(
   const { id, ...metricBody } = metric
 
   if (addCommitShaToDescription) {
-    metricBody.description = `${metricBody.description} - ${githubSha}`
+    metricBody.description = `${metricBody.description} Commit hash: ${githubSha}`
   }
 
   const response = await axios.patch(url, metricBody, { headers })
