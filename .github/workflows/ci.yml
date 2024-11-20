@@ -67,3 +67,4 @@ jobs:
           online-experimentation-workspace-id:
             ${{ vars.ONLINE_EXPERIMENTATION_WORKSPACE_ID }}
           add-commit-hash-to-metric-description: false
+          strict: false
