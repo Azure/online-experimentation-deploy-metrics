@@ -11,6 +11,7 @@
     "desiredDirection",
     "definition"
   ],
+  "additionalProperties": false,
   "properties": {
     "id": {
       "type": "string",
@@ -72,7 +73,8 @@
           "description": "Event to observe."
         }
       },
-      "required": ["event"]
+      "required": ["event"],
+      "additionalProperties": false
     },
     "UserCountDefinition": {
       "type": "object",
@@ -88,7 +90,8 @@
           "description": "Event to observe."
         }
       },
-      "required": ["event"]
+      "required": ["event"],
+      "additionalProperties": false
     },
     "EventRateDefinition": {
       "type": "object",
@@ -108,7 +111,8 @@
           "description": "The event contributes to the rate numerator if it satisfies this condition."
         }
       },
-      "description": "The definition of an EventRate metric. This metric kind counts the percentage of events that satisfy a condition."
+      "description": "The definition of an EventRate metric. This metric kind counts the percentage of events that satisfy a condition.",
+      "additionalProperties": false
     },
     "UserRateDefinition": {
       "type": "object",
@@ -128,7 +132,8 @@
           "description": "The end event to observe, which is a condition for the rate numerator."
         }
       },
-      "description": "The definition of a UserRate metric. This metric kind counts the percentage of users with the start event that then encounter the end event. The metric denominator counts the number of users who encounter the start event at least once. The metric numerator counts the number of users who encounter both the start and end events at least once. The computation is ordered, so the start event must occur before the end event."
+      "description": "The definition of a UserRate metric. This metric kind counts the percentage of users with the start event that then encounter the end event. The metric denominator counts the number of users who encounter the start event at least once. The metric numerator counts the number of users who encounter both the start and end events at least once. The computation is ordered, so the start event must occur before the end event.",
+      "additionalProperties": false
     },
     "PercentileDefinition": {
       "type": "object",
@@ -153,7 +158,8 @@
           "description": "The percentile to measure."
         }
       },
-      "description": "The definition of a Percentile metric. This metric kind measures the percentile of an event property."
+      "description": "The definition of a Percentile metric. This metric kind measures the percentile of an event property.",
+      "additionalProperties": false
     },
     "SumDefinition": {
       "type": "object",
@@ -169,7 +175,8 @@
           "description": "The value to aggregate."
         }
       },
-      "description": "The definition of a Sum metric. This metric kind measures the sum of an event property. Experiment analysis accounts for unequal traffic allocation."
+      "description": "The definition of a Sum metric. This metric kind measures the sum of an event property. Experiment analysis accounts for unequal traffic allocation.",
+      "additionalProperties": false
     },
     "AverageDefinition": {
       "type": "object",
@@ -185,7 +192,8 @@
           "description": "The value to aggregate."
         }
       },
-      "description": "The definition of an Average metric. This metric kind measures the average of an event property."
+      "description": "The definition of an Average metric. This metric kind measures the average of an event property.",
+      "additionalProperties": false
     },
     "ObservedEvent": {
       "type": "object",
@@ -202,7 +210,8 @@
           "description": "[Optional] A condition to filter events."
         }
       },
-      "required": ["eventName"]
+      "required": ["eventName"],
+      "additionalProperties": false
     },
     "EventCondition": {
       "type": "string",
@@ -232,7 +241,8 @@
           "description": "The key of the event property to aggregate."
         }
       },
-      "description": "An event property value aggregated by a metric."
+      "description": "An event property value aggregated by a metric.",
+      "additionalProperties": false
     },
     "MetricDefinition": {
       "description": "The metric definition, which determines how the metric value is calculated from event data.",
