@@ -25,6 +25,17 @@ describe('loadConfigFiles', () => {
     await expect(promise).rejects.toThrow(/Failed to parse:/)
   })
 
+  it('throw when config format is invalid with additional properties', async () => {
+    const promise = loadConfigFiles(
+      `${__dirname}/invalid-data/invalid-definition-with-eventproperty.json`
+    )
+
+    await expect(promise).rejects.toThrow(ArgumentError)
+    await expect(promise).rejects.toThrow(
+      /Schema validation failed for metric: avg_rev_per_purchase. It should follow the schema defined in the schema file/
+    )
+  })
+
   it('throw when json is not following schema', async () => {
     const promise = loadConfigFiles(
       `${__dirname}/invalid-data/invalid-kind-enum.json`
