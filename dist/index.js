@@ -46264,6 +46264,10 @@ async function validateMetrics(input, metrics) {
 }
 async function createOrUpdateMetrics(input, metrics) {
     const accessToken = await getToken();
+    if (input.strictSync) {
+        core.info('Deleting metrics in strict mode');
+        await deleteRemainingMetrics(input, metrics);
+    }
     const createResults = await Promise.all(metrics.map(metric => createOrUpdateMetric(input, metric, accessToken).then(response => ({
         response,
         metric
@@ -46275,10 +46279,6 @@ async function createOrUpdateMetrics(input, metrics) {
         throw new errors_1.ValidationError('Metric create or update failed');
     }
     core.info('All metrics are created or updated successfully');
-    if (input.strictSync) {
-        core.info('Deleting remaining metrics in strict mode');
-        await deleteRemainingMetrics(input, metrics);
-    }
     core.info('Operation completed successfully');
 }
 async function validateMetric(expWorkspaceId, metric, accessToken) {
