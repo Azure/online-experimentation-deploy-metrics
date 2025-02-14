@@ -21,6 +21,10 @@ inputs:
     description: 'Online Experimentation workspace id'
     required: true
 
+  location: # Online Experimentation workspace location
+    description: 'Online Experimentation workspace location. Example: eastus2'
+    required: true
+
   operation: # Validate the configuration file only
     description:
       'Possible values: validate or deploy - deploy by default. validate: only

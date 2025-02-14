@@ -16,6 +16,7 @@ jest.mock('../src/metric-client')
 describe('run', () => {
   const mockInput: Input = {
     configFile: 'test-data/valid.json',
+    location: 'test',
     operationType: 'deploy',
     expWorkspaceId: 'test',
     strictSync: false,

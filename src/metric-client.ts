@@ -13,8 +13,8 @@ import { DefaultAzureCredential } from '@azure/identity'
 import * as core from '@actions/core'
 import { ApiError, ValidationError } from './errors'
 
-const baseUri = 'https://exp.azure.net'
-const apiVersion = '2024-11-30-preview'
+const resourceUri = 'https://exp.azure.net'
+const apiVersion = '2025-05-31-preview'
 const idPattern = '^[a-z_][a-z0-9_]*$'
 
 export async function validateMetrics(
@@ -25,9 +25,10 @@ export async function validateMetrics(
 
   const validationResults = await Promise.all(
     metrics.map(metric =>
-      validateMetric(input.expWorkspaceId, metric, accessToken).then(
-        response => ({ response, metric })
-      )
+      validateMetric(input, metric, accessToken).then(response => ({
+        response,
+        metric
+      }))
     )
   )
 
@@ -73,7 +74,7 @@ export async function createOrUpdateMetrics(
 }
 
 async function validateMetric(
-  expWorkspaceId: string,
+  input: Input,
   metric: Metric,
   accessToken: string
 ): Promise<MetricValidationResponse> {
@@ -82,7 +83,7 @@ async function validateMetric(
     return buildInvalidMetricValidationResponse(metric)
   }
 
-  const url = `${baseUri}/workspaces/${expWorkspaceId}/metrics/${metric.id}:validate?api-version=${apiVersion}`
+  const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}:validate?api-version=${apiVersion}`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
     'Content-Type': 'application/merge-patch+json',
@@ -108,7 +109,7 @@ async function createOrUpdateMetric(
   }
 
   const { expWorkspaceId, githubSha, addCommitShaToDescription } = input
-  const url = `${baseUri}/workspaces/${expWorkspaceId}/metrics/${metric.id}?api-version=${apiVersion}`
+  const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}?api-version=${apiVersion}`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
     'Content-Type': 'application/merge-patch+json',
@@ -134,9 +135,8 @@ async function deleteRemainingMetrics(
   metrics: Metric[]
 ): Promise<void> {
   const accessToken = await getToken()
-  const expWorkspaceId = input.expWorkspaceId
 
-  const url = `${baseUri}/workspaces/${expWorkspaceId}/metrics?api-version=${apiVersion}&top=100`
+  const url = `${getBaseUri(input)}/experiment-metrics?api-version=${apiVersion}&top=100`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
     'Content-Type': 'application/merge-patch+json',
@@ -163,9 +163,10 @@ async function deleteRemainingMetrics(
 
   const deleteResults = await Promise.all(
     metricIdsToDelete.map((metricId: string) =>
-      deleteMetric(input.expWorkspaceId, metricId, accessToken).then(
-        response => ({ response, metricId })
-      )
+      deleteMetric(input, metricId, accessToken).then(response => ({
+        response,
+        metricId
+      }))
     )
   )
 
@@ -181,11 +182,11 @@ async function deleteRemainingMetrics(
 }
 
 async function deleteMetric(
-  expWorkspaceId: string,
+  input: Input,
   metricId: string,
   accessToken: string
 ): Promise<ApiResponse> {
-  const url = `${baseUri}/workspaces/${expWorkspaceId}/metrics/${metricId}?api-version=${apiVersion}`
+  const url = `${getBaseUri(input)}/experiment-metrics/${metricId}?api-version=${apiVersion}`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
     'Content-Type': 'application/merge-patch+json',
@@ -255,8 +256,12 @@ const isValidMetricId = (metricId: string) => {
 
 async function getToken() {
   const credential = new DefaultAzureCredential()
-  const tokenResponse = await credential.getToken(`${baseUri}/.default`)
+  const tokenResponse = await credential.getToken(`${resourceUri}/.default`)
   return tokenResponse.token
+}
+
+function getBaseUri(input: Input): string {
+  return `https://${input.expWorkspaceId}.${input.location}.exp.azure.net`
 }
 
 function buildInvalidMetricResponse(metric: Metric): MetricResponse {

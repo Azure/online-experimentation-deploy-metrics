@@ -6,10 +6,10 @@
       "lifecycle": "Active",
       "displayName": "Average total (prompt + response) token count per exchange",
       "description": "Placeholder description",
-      "tags": ["Cost"],
+      "categories": ["Cost"],
       "desiredDirection": "Decrease",
       "definition": {
-        "kind": "EventCount"
+        "type": "EventCount"
       }
     }
   ]

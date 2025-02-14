@@ -18,6 +18,8 @@ describe('getActionInput', () => {
       switch (name) {
         case 'online-experimentation-workspace-id':
           return 'workspace1'
+        case 'location':
+          return 'location1'
         case 'path':
           return 'config1'
         case 'operation':
@@ -33,6 +35,7 @@ describe('getActionInput', () => {
     const input = getActionInput()
     expect(input).toEqual({
       expWorkspaceId: 'workspace1',
+      location: 'location1',
       configFile: 'config1',
       operationType: 'deploy',
       strictSync: false,
@@ -46,6 +49,8 @@ describe('getActionInput', () => {
       switch (name) {
         case 'online-experimentation-workspace-id':
           return ''
+        case 'location':
+          return 'location1'
         case 'path':
           return 'config1'
         case 'operation':
@@ -68,6 +73,8 @@ describe('getActionInput', () => {
       switch (name) {
         case 'online-experimentation-workspace-id':
           return 'workspace1'
+        case 'location':
+          return 'location1'
         case 'path':
           return ''
         case 'operation':
@@ -90,6 +97,8 @@ describe('getActionInput', () => {
       switch (name) {
         case 'online-experimentation-workspace-id':
           return 'workspace1'
+        case 'location':
+          return 'location1'
         case 'path':
           return 'config1'
         case 'operation':
@@ -111,6 +120,8 @@ describe('getActionInput', () => {
       switch (name) {
         case 'online-experimentation-workspace-id':
           return 'workspace1'
+        case 'location':
+          return 'location1'
         case 'path':
           return 'config1'
         case 'operation':
@@ -133,6 +144,8 @@ describe('getActionInput', () => {
       switch (name) {
         case 'online-experimentation-workspace-id':
           return 'workspace1'
+        case 'location':
+          return 'location1'
         case 'path':
           return 'config1'
         case 'operation':
@@ -154,6 +167,8 @@ describe('getActionInput', () => {
       switch (name) {
         case 'online-experimentation-workspace-id':
           return 'workspace1'
+        case 'location':
+          return 'location1'
         case 'path':
           return 'config1'
         case 'operation':
@@ -177,6 +192,8 @@ describe('getActionInput', () => {
       switch (name) {
         case 'online-experimentation-workspace-id':
           return 'workspace1'
+        case 'location':
+          return 'location1'
         case 'path':
           return 'config1'
         case 'operation':
@@ -201,6 +218,8 @@ describe('getActionInput', () => {
       switch (name) {
         case 'online-experimentation-workspace-id':
           return 'workspace1'
+        case 'location':
+          return 'location1'
         case 'path':
           return 'config1'
         case 'operation':

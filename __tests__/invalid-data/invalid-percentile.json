@@ -6,10 +6,10 @@
       "lifecycle": "Active",
       "displayName": "Median total (prompt + response) token count per exchange",
       "description": "Placeholder description",
-      "tags": ["Cost"],
+      "categories": ["Cost"],
       "desiredDirection": "Decrease",
       "definition": {
-        "kind": "Percentile",
+        "type": "Percentile",
         "value": {
           "eventName": "ResponseReceived",
           "eventProperty": "TotalTokenCount"

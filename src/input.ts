@@ -14,6 +14,7 @@ export function getActionInput(): Input {
     expWorkspaceId: getRequiredInputString(
       'online-experimentation-workspace-id'
     ),
+    location: getRequiredInputString('location'),
     configFile: getRequiredInputString('path'),
     operationType: getOperationType(),
     strictSync: getBooleanInput('strict', true),

@@ -47,7 +47,7 @@ describe('loadConfigFiles', () => {
       /Schema validation failed for metric: avg_total_token_count. It should follow the schema defined/
     )
     await expect(promise).rejects.toThrow(
-      /instance.definition.kind: is not one of enum values: EventCount,UserCount,EventRate,UserRate,Sum,Average,Percentile/
+      /instance.definition.type: is not one of enum values: EventCount,UserCount,EventRate,UserRate,Sum,Average,Percentile/
     )
   })
 

@@ -7,7 +7,7 @@ import { ArgumentError, ParseError } from './errors'
 import * as fs from 'fs'
 import { Metric } from './models'
 import * as JsonValidator from 'jsonschema'
-import metricsSchema from '../schema/Metrics.v1.0.0.schema.json'
+import metricsSchema from '../schema/Metrics.v2.0.0.schema.json'
 
 const validator = new JsonValidator.Validator()
 

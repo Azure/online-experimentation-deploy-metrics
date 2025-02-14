@@ -17,6 +17,7 @@ export interface Metric {
 
 export interface Input {
   expWorkspaceId: string
+  location: string
   configFile: string
   operationType: 'validate' | 'deploy'
   strictSync: boolean

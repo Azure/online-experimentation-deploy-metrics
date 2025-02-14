@@ -7,7 +7,7 @@
     "lifecycle",
     "displayName",
     "description",
-    "tags",
+    "categories",
     "desiredDirection",
     "definition"
   ],
@@ -38,9 +38,9 @@
       "minLength": 1,
       "maxLength": 1000
     },
-    "tags": {
+    "categories": {
       "type": "array",
-      "description": "The tags of the metric.",
+      "description": "The categories of the metric.",
       "items": {
         "type": "string",
         "description": "A tag attached to the metric.",
@@ -61,12 +61,12 @@
   "definitions": {
     "EventCountDefinition": {
       "type": "object",
-      "description": "The definition of an EventCount metric. This metric kind counts the observations of an event. Experiment analysis accounts for unequal traffic allocation.",
+      "description": "The definition of an EventCount metric. This metric type counts the observations of an event. Experiment analysis accounts for unequal traffic allocation.",
       "properties": {
-        "kind": {
+        "type": {
           "type": "string",
           "enum": ["EventCount"],
-          "description": "The kind of metric."
+          "description": "The type of metric."
         },
         "event": {
           "$ref": "#/definitions/ObservedEvent",
@@ -78,12 +78,12 @@
     },
     "UserCountDefinition": {
       "type": "object",
-      "description": "The definition of a UserCount metric. This metric kind counts the users who encounter an event. Experiment analysis accounts for unequal traffic allocation.",
+      "description": "The definition of a UserCount metric. This metric type counts the users who encounter an event. Experiment analysis accounts for unequal traffic allocation.",
       "properties": {
-        "kind": {
+        "type": {
           "type": "string",
           "enum": ["UserCount"],
-          "description": "The kind of metric."
+          "description": "The type of metric."
         },
         "event": {
           "$ref": "#/definitions/ObservedEvent",
@@ -95,33 +95,33 @@
     },
     "EventRateDefinition": {
       "type": "object",
-      "required": ["kind", "event", "condition"],
+      "required": ["type", "event", "rateCondition"],
       "properties": {
-        "kind": {
+        "type": {
           "type": "string",
           "enum": ["EventRate"],
-          "description": "The kind of metric."
+          "description": "The type of metric."
         },
         "event": {
           "$ref": "#/definitions/ObservedEvent",
           "description": "Event to observe as the rate denominator."
         },
-        "condition": {
+        "rateCondition": {
           "$ref": "#/definitions/EventCondition",
           "description": "The event contributes to the rate numerator if it satisfies this condition."
         }
       },
-      "description": "The definition of an EventRate metric. This metric kind counts the percentage of events that satisfy a condition.",
+      "description": "The definition of an EventRate metric. This metric type counts the percentage of events that satisfy a condition.",
       "additionalProperties": false
     },
     "UserRateDefinition": {
       "type": "object",
-      "required": ["kind", "startEvent", "endEvent"],
+      "required": ["type", "startEvent", "endEvent"],
       "properties": {
-        "kind": {
+        "type": {
           "type": "string",
           "enum": ["UserRate"],
-          "description": "The kind of metric."
+          "description": "The type of metric."
         },
         "startEvent": {
           "$ref": "#/definitions/ObservedEvent",
@@ -132,17 +132,17 @@
           "description": "The end event to observe, which is a condition for the rate numerator."
         }
       },
-      "description": "The definition of a UserRate metric. This metric kind counts the percentage of users with the start event that then encounter the end event. The metric denominator counts the number of users who encounter the start event at least once. The metric numerator counts the number of users who encounter both the start and end events at least once. The computation is ordered, so the start event must occur before the end event.",
+      "description": "The definition of a UserRate metric. This metric type counts the percentage of users with the start event that then encounter the end event. The metric denominator counts the number of users who encounter the start event at least once. The metric numerator counts the number of users who encounter both the start and end events at least once. The computation is ordered, so the start event must occur before the end event.",
       "additionalProperties": false
     },
     "PercentileDefinition": {
       "type": "object",
-      "required": ["kind", "value", "percentile"],
+      "required": ["type", "value", "percentile"],
       "properties": {
-        "kind": {
+        "type": {
           "type": "string",
           "enum": ["Percentile"],
-          "description": "The kind of metric."
+          "description": "The type of metric."
         },
         "value": {
           "$ref": "#/definitions/AggregatedValue",
@@ -158,41 +158,41 @@
           "description": "The percentile to measure."
         }
       },
-      "description": "The definition of a Percentile metric. This metric kind measures the percentile of an event property.",
+      "description": "The definition of a Percentile metric. This metric type measures the percentile of an event property.",
       "additionalProperties": false
     },
     "SumDefinition": {
       "type": "object",
-      "required": ["kind", "value"],
+      "required": ["type", "value"],
       "properties": {
-        "kind": {
+        "type": {
           "type": "string",
           "enum": ["Sum"],
-          "description": "The kind of metric."
+          "description": "The type of metric."
         },
         "value": {
           "$ref": "#/definitions/AggregatedValue",
           "description": "The value to aggregate."
         }
       },
-      "description": "The definition of a Sum metric. This metric kind measures the sum of an event property. Experiment analysis accounts for unequal traffic allocation.",
+      "description": "The definition of a Sum metric. This metric type measures the sum of an event property. Experiment analysis accounts for unequal traffic allocation.",
       "additionalProperties": false
     },
     "AverageDefinition": {
       "type": "object",
-      "required": ["kind", "value"],
+      "required": ["type", "value"],
       "properties": {
-        "kind": {
+        "type": {
           "type": "string",
           "enum": ["Average"],
-          "description": "The kind of metric."
+          "description": "The type of metric."
         },
         "value": {
           "$ref": "#/definitions/AggregatedValue",
           "description": "The value to aggregate."
         }
       },
-      "description": "The definition of an Average metric. This metric kind measures the average of an event property.",
+      "description": "The definition of an Average metric. This metric type measures the average of an event property.",
       "additionalProperties": false
     },
     "ObservedEvent": {
@@ -248,7 +248,7 @@
       "description": "The metric definition, which determines how the metric value is calculated from event data.",
       "type": "object",
       "properties": {
-        "kind": {
+        "type": {
           "type": "string",
           "enum": [
             "EventCount",
@@ -271,7 +271,7 @@
         { "$ref": "#/definitions/AverageDefinition" },
         { "$ref": "#/definitions/PercentileDefinition" }
       ],
-      "required": ["kind"]
+      "required": ["type"]
     }
   }
 }
