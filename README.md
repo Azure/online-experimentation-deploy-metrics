@@ -87,7 +87,7 @@ jobs:
           enable-AzPSSession: true
 
       - name: Run Online Experimentation Deploy metrics
-        uses: azure/online-experimentation-deploy-metrics@v1-beta
+        uses: azure/online-experimentation-deploy-metrics@v2
         with:
           path: /path/to/metrics-*.json
           online-experimentation-workspace-id: 2a63a6cb-d7bb-4af7-ba92-8d1d7e6f091f
@@ -132,7 +132,7 @@ jobs:
           enable-AzPSSession: true
 
       - name: Run Online Experimentation deploy metrics
-        uses: azure/online-experimentation-deploy-metrics@v1-beta
+        uses: azure/online-experimentation-deploy-metrics@v2
         with:
           path: /path/to/metrics-*.json
           online-experimentation-workspace-id: 2a63a6cb-d7bb-4af7-ba92-8d1d7e6f091f

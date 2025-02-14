@@ -75,7 +75,7 @@ export async function loadConfigFiles(inputPattern: string): Promise<Metric[]> {
         const details = r.errors
           .map(e => `${e.property}: ${e.message}`)
           .join('\n')
-        return `Schema validation failed for metric: ${r.id}. It should follow the schema defined in the schema file https://github.com/Azure/online-experimentation-deploy-metrics/tree/main/schema/Metrics.v1.0.0.schema.json. Errors: ${details}`
+        return `Schema validation failed for metric: ${r.id}. It should follow the schema defined in the schema file https://github.com/Azure/online-experimentation-deploy-metrics/tree/main/schema/Metrics.v2.0.0.schema.json. Errors: ${details}`
       })
       .join('\n')
 
