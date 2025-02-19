@@ -16,9 +16,8 @@ jest.mock('../src/metric-client')
 describe('run', () => {
   const mockInput: Input = {
     configFile: 'test-data/valid.json',
-    location: 'test',
     operationType: 'deploy',
-    expWorkspaceId: 'test',
+    expWorkspaceEndpoint: 'https://test.eastus2.exp.azure.net',
     strictSync: false,
     addCommitShaToDescription: false,
     githubSha: 'test'

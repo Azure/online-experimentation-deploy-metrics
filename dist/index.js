@@ -46101,14 +46101,21 @@ const core = __importStar(__nccwpck_require__(7484));
 function getActionInput() {
     const shouldAddCommit = getBooleanInput('add-commit-hash-to-metric-description', false);
     return {
-        expWorkspaceId: getRequiredInputString('online-experimentation-workspace-id'),
-        location: getRequiredInputString('location'),
+        expWorkspaceEndpoint: getExpWorkspaceEndpoint(),
         configFile: getRequiredInputString('path'),
         operationType: getOperationType(),
         strictSync: getBooleanInput('strict', true),
         addCommitShaToDescription: shouldAddCommit,
         githubSha: shouldAddCommit ? getGithubSha() : ''
     };
+}
+function getExpWorkspaceEndpoint() {
+    let expWorkspaceEndpoint = getRequiredInputString('online-experimentation-workspace-endpoint');
+    expWorkspaceEndpoint = expWorkspaceEndpoint.trim().replace(/\/+$/, '');
+    if (!expWorkspaceEndpoint.startsWith('https://')) {
+        throw new errors_1.ArgumentError('The online-experimentation-workspace-endpoint should start with https://');
+    }
+    return expWorkspaceEndpoint;
 }
 function getGithubSha() {
     const githubSha = process.env.GITHUB_SHA;
@@ -46308,7 +46315,7 @@ async function createOrUpdateMetric(input, metric, accessToken) {
         // TODO: Remove this check once the API is fixed
         return buildInvalidMetricResponse(metric);
     }
-    const { expWorkspaceId, githubSha, addCommitShaToDescription } = input;
+    const { githubSha, addCommitShaToDescription } = input;
     const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}?api-version=${apiVersion}`;
     const headers = {
         Authorization: `Bearer ${accessToken}`,
@@ -46417,7 +46424,7 @@ async function getToken() {
     return tokenResponse.token;
 }
 function getBaseUri(input) {
-    return `https://${input.expWorkspaceId}.${input.location}.exp.azure.net`;
+    return `${input.expWorkspaceEndpoint}`;
 }
 function buildInvalidMetricResponse(metric) {
     return {

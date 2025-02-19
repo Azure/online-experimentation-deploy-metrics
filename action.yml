@@ -17,12 +17,8 @@ inputs:
       exclude files.'
     required: true
 
-  online-experimentation-workspace-id: # Online Experimentation workspace id
-    description: 'Online Experimentation workspace id'
-    required: true
-
-  location: # Online Experimentation workspace location
-    description: 'Online Experimentation workspace location. Example: eastus2'
+  online-experimentation-workspace-endpoint: # Online Experimentation workspace endpoint
+    description: 'Online Experimentation workspace endpoint'
     required: true
 
   operation: # Validate the configuration file only

@@ -108,7 +108,7 @@ async function createOrUpdateMetric(
     return buildInvalidMetricResponse(metric)
   }
 
-  const { expWorkspaceId, githubSha, addCommitShaToDescription } = input
+  const { githubSha, addCommitShaToDescription } = input
   const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}?api-version=${apiVersion}`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
@@ -261,7 +261,7 @@ async function getToken() {
 }
 
 function getBaseUri(input: Input): string {
-  return `https://${input.expWorkspaceId}.${input.location}.exp.azure.net`
+  return `${input.expWorkspaceEndpoint}`
 }
 
 function buildInvalidMetricResponse(metric: Metric): MetricResponse {
