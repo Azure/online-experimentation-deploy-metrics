@@ -64,7 +64,7 @@ jobs:
         uses: ./
         with:
           path: 'metric-configs/metrics-*.json'
-          online-experimentation-workspace-enndpoint:
+          online-experimentation-workspace-endpoint:
             ${{ vars.ONLINE_EXPERIMENTATION_WORKSPACE_ENDPOINT }}
           add-commit-hash-to-metric-description: false
           strict: true
