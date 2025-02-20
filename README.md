@@ -135,7 +135,7 @@ jobs:
         uses: azure/online-experimentation-deploy-metrics@v2
         with:
           path: /path/to/metrics-*.json
-          online-experimentation-workspace-id: https://2a63a6cb-d7bb-4af7-ba92-8d1d7e6f091f.eastus2.exp.azure.net
+          online-experimentation-workspace-endpoint: https://2a63a6cb-d7bb-4af7-ba92-8d1d7e6f091f.eastus2.exp.azure.net
           operation: validate
 ```
 

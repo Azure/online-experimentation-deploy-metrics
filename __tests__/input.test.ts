@@ -17,7 +17,7 @@ describe('getActionInput', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
         case 'online-experimentation-workspace-endpoint':
-          return 'https://workspace1'
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':
@@ -32,7 +32,7 @@ describe('getActionInput', () => {
     })
     const input = getActionInput()
     expect(input).toEqual({
-      expWorkspaceEndpoint: 'https://workspace1',
+      expWorkspaceEndpoint: 'https://workspace1.eastus2.exp.azure.net',
       configFile: 'config1',
       operationType: 'deploy',
       strictSync: false,
@@ -67,7 +67,7 @@ describe('getActionInput', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
         case 'online-experimentation-workspace-endpoint':
-          return 'https://workspace1'
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return ''
         case 'operation':
@@ -89,7 +89,7 @@ describe('getActionInput', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
         case 'online-experimentation-workspace-endpoint':
-          return 'https://workspace1'
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':
@@ -110,7 +110,7 @@ describe('getActionInput', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
         case 'online-experimentation-workspace-endpoint':
-          return 'https://workspace1'
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':
@@ -132,7 +132,7 @@ describe('getActionInput', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
         case 'online-experimentation-workspace-endpoint':
-          return 'https://workspace1'
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':
@@ -153,7 +153,7 @@ describe('getActionInput', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
         case 'online-experimentation-workspace-endpoint':
-          return 'https://workspace1'
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':
@@ -176,7 +176,7 @@ describe('getActionInput', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
         case 'online-experimentation-workspace-endpoint':
-          return 'https://workspace1'
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':
@@ -200,7 +200,7 @@ describe('getActionInput', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
         case 'online-experimentation-workspace-endpoint':
-          return 'https://workspace1'
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':

@@ -32,6 +32,12 @@ function getExpWorkspaceEndpoint() {
     )
   }
 
+  if (!expWorkspaceEndpoint.endsWith('.exp.azure.net')) {
+    throw new ArgumentError(
+      'The online-experimentation-workspace-endpoint should end with .exp.azure.net'
+    )
+  }
+
   return expWorkspaceEndpoint
 }
 
