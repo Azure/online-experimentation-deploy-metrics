@@ -6,10 +6,10 @@
       "displayName": "Average revenue per purchase [USD]",
       "description": "The average revenue per purchase transaction in USD. Refund transactions are excluded from this metric. The total revenue might increase while this metric decreases if the number of purchases increases.",
       "lifecycle": "Active",
-      "tags": ["abcd"],
+      "categories": ["abcd"],
       "desiredDirection": "Increase",
       "definition": {
-        "kind": "EventCount",
+        "type": "EventCount",
         "event": {
           "eventName": "Transaction",
           "eventProperty": "Revenue",

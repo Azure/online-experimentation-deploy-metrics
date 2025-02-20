@@ -27,7 +27,7 @@ let setOutputMock: jest.SpiedFunction<typeof core.setOutput>
 // Mock data for testing
 const mockAccessToken = 'mocked-access-token'
 const mockInput: Input = {
-  expWorkspaceId: 'workspace-id',
+  expWorkspaceEndpoint: 'https://workspace-id.eastus2.exp.azure.net',
   strictSync: false,
   configFile: 'path',
   operationType: 'deploy',

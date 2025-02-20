@@ -38,8 +38,8 @@ path: |
   !/path/to/metrics-config-ignore.json
 ```
 
-- `online-experimentation-workspace-id` - An Azure online experimentation
-  workspace id.
+- `online-experimentation-workspace-endpoint` - An Azure online experimentation
+  workspace endpoint.
 - `operation` - Choices: validate, deploy (default: deploy).
   - validate: only validates the configuration file.
   - deploy: syncs the configuration file with Online Experimentation workspace
@@ -87,10 +87,10 @@ jobs:
           enable-AzPSSession: true
 
       - name: Run Online Experimentation Deploy metrics
-        uses: azure/online-experimentation-deploy-metrics@v1-beta
+        uses: azure/online-experimentation-deploy-metrics@v2
         with:
           path: /path/to/metrics-*.json
-          online-experimentation-workspace-id: 2a63a6cb-d7bb-4af7-ba92-8d1d7e6f091f
+          online-experimentation-workspace-endpoint: https://2a63a6cb-d7bb-4af7-ba92-8d1d7e6f091f.eastus2.exp.azure.net
           operation: deploy
           strict: true
           add-commit-hash-to-metric-description: true
@@ -132,10 +132,10 @@ jobs:
           enable-AzPSSession: true
 
       - name: Run Online Experimentation deploy metrics
-        uses: azure/online-experimentation-deploy-metrics@v1-beta
+        uses: azure/online-experimentation-deploy-metrics@v2
         with:
           path: /path/to/metrics-*.json
-          online-experimentation-workspace-id: 2a63a6cb-d7bb-4af7-ba92-8d1d7e6f091f
+          online-experimentation-workspace-endpoint: https://2a63a6cb-d7bb-4af7-ba92-8d1d7e6f091f.eastus2.exp.azure.net
           operation: validate
 ```
 

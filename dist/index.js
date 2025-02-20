@@ -45955,7 +45955,7 @@ const glob = __importStar(__nccwpck_require__(7206));
 const errors_1 = __nccwpck_require__(3916);
 const fs = __importStar(__nccwpck_require__(9896));
 const JsonValidator = __importStar(__nccwpck_require__(4145));
-const Metrics_v1_0_0_schema_json_1 = __importDefault(__nccwpck_require__(4095));
+const Metrics_v2_0_0_schema_json_1 = __importDefault(__nccwpck_require__(7444));
 const validator = new JsonValidator.Validator();
 async function loadConfigFiles(inputPattern) {
     core.info('Loading configuration files from: ' + inputPattern);
@@ -45995,7 +45995,7 @@ async function loadConfigFiles(inputPattern) {
         throw new errors_1.ArgumentError(message);
     }
     const schemaValidationResults = mergedMetrics.map(m => {
-        return { id: m.id, ...validator.validate(m, Metrics_v1_0_0_schema_json_1.default) };
+        return { id: m.id, ...validator.validate(m, Metrics_v2_0_0_schema_json_1.default) };
     });
     const failedValidations = schemaValidationResults.filter(r => r.errors.length > 0);
     if (failedValidations.length > 0) {
@@ -46004,7 +46004,7 @@ async function loadConfigFiles(inputPattern) {
             const details = r.errors
                 .map(e => `${e.property}: ${e.message}`)
                 .join('\n');
-            return `Schema validation failed for metric: ${r.id}. It should follow the schema defined in the schema file https://github.com/Azure/online-experimentation-deploy-metrics/tree/main/schema/Metrics.v1.0.0.schema.json. Errors: ${details}`;
+            return `Schema validation failed for metric: ${r.id}. It should follow the schema defined in the schema file https://github.com/Azure/online-experimentation-deploy-metrics/tree/main/schema/Metrics.v2.0.0.schema.json. Errors: ${details}`;
         })
             .join('\n');
         core.error(message);
@@ -46101,13 +46101,24 @@ const core = __importStar(__nccwpck_require__(7484));
 function getActionInput() {
     const shouldAddCommit = getBooleanInput('add-commit-hash-to-metric-description', false);
     return {
-        expWorkspaceId: getRequiredInputString('online-experimentation-workspace-id'),
+        expWorkspaceEndpoint: getExpWorkspaceEndpoint(),
         configFile: getRequiredInputString('path'),
         operationType: getOperationType(),
         strictSync: getBooleanInput('strict', true),
         addCommitShaToDescription: shouldAddCommit,
         githubSha: shouldAddCommit ? getGithubSha() : ''
     };
+}
+function getExpWorkspaceEndpoint() {
+    let expWorkspaceEndpoint = getRequiredInputString('online-experimentation-workspace-endpoint');
+    expWorkspaceEndpoint = expWorkspaceEndpoint.trim().replace(/\/+$/, '');
+    if (!expWorkspaceEndpoint.startsWith('https://')) {
+        throw new errors_1.ArgumentError('The online-experimentation-workspace-endpoint should start with https://');
+    }
+    if (!expWorkspaceEndpoint.endsWith('.exp.azure.net')) {
+        throw new errors_1.ArgumentError('The online-experimentation-workspace-endpoint should end with .exp.azure.net');
+    }
+    return expWorkspaceEndpoint;
 }
 function getGithubSha() {
     const githubSha = process.env.GITHUB_SHA;
@@ -46249,12 +46260,15 @@ const axios_1 = __importDefault(__nccwpck_require__(7269));
 const identity_1 = __nccwpck_require__(3983);
 const core = __importStar(__nccwpck_require__(7484));
 const errors_1 = __nccwpck_require__(3916);
-const baseUri = 'https://exp.azure.net';
-const apiVersion = '2024-11-30-preview';
+const resourceUri = 'https://exp.azure.net';
+const apiVersion = '2025-05-31-preview';
 const idPattern = '^[a-z_][a-z0-9_]*$';
 async function validateMetrics(input, metrics) {
     const accessToken = await getToken();
-    const validationResults = await Promise.all(metrics.map(metric => validateMetric(input.expWorkspaceId, metric, accessToken).then(response => ({ response, metric }))));
+    const validationResults = await Promise.all(metrics.map(metric => validateMetric(input, metric, accessToken).then(response => ({
+        response,
+        metric
+    }))));
     const results = validationResults.map(({ response, metric }) => {
         return handleValidationResult(response, metric);
     });
@@ -46281,12 +46295,12 @@ async function createOrUpdateMetrics(input, metrics) {
     core.info('All metrics are created or updated successfully');
     core.info('Operation completed successfully');
 }
-async function validateMetric(expWorkspaceId, metric, accessToken) {
+async function validateMetric(input, metric, accessToken) {
     if (!isValidMetricId(metric.id)) {
         // TODO: Remove this check once the API is fixed
         return buildInvalidMetricValidationResponse(metric);
     }
-    const url = `${baseUri}/workspaces/${expWorkspaceId}/metrics/${metric.id}:validate?api-version=${apiVersion}`;
+    const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}:validate?api-version=${apiVersion}`;
     const headers = {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/merge-patch+json',
@@ -46304,8 +46318,8 @@ async function createOrUpdateMetric(input, metric, accessToken) {
         // TODO: Remove this check once the API is fixed
         return buildInvalidMetricResponse(metric);
     }
-    const { expWorkspaceId, githubSha, addCommitShaToDescription } = input;
-    const url = `${baseUri}/workspaces/${expWorkspaceId}/metrics/${metric.id}?api-version=${apiVersion}`;
+    const { githubSha, addCommitShaToDescription } = input;
+    const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}?api-version=${apiVersion}`;
     const headers = {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/merge-patch+json',
@@ -46324,8 +46338,7 @@ async function createOrUpdateMetric(input, metric, accessToken) {
 }
 async function deleteRemainingMetrics(input, metrics) {
     const accessToken = await getToken();
-    const expWorkspaceId = input.expWorkspaceId;
-    const url = `${baseUri}/workspaces/${expWorkspaceId}/metrics?api-version=${apiVersion}&top=100`;
+    const url = `${getBaseUri(input)}/experiment-metrics?api-version=${apiVersion}&top=100`;
     const headers = {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/merge-patch+json',
@@ -46343,7 +46356,10 @@ async function deleteRemainingMetrics(input, metrics) {
         .map((v) => v.id)
         .filter((item) => !metricIdsToKeep.includes(item));
     core.info(`Found ${metricIdsToDelete.length} metrics that needs to be deleted`);
-    const deleteResults = await Promise.all(metricIdsToDelete.map((metricId) => deleteMetric(input.expWorkspaceId, metricId, accessToken).then(response => ({ response, metricId }))));
+    const deleteResults = await Promise.all(metricIdsToDelete.map((metricId) => deleteMetric(input, metricId, accessToken).then(response => ({
+        response,
+        metricId
+    }))));
     const results = deleteResults.map(({ response, metricId }) => {
         return handleDeleteResult(response, metricId);
     });
@@ -46352,8 +46368,8 @@ async function deleteRemainingMetrics(input, metrics) {
     }
     core.info('Additional metrics are deleted successfully');
 }
-async function deleteMetric(expWorkspaceId, metricId, accessToken) {
-    const url = `${baseUri}/workspaces/${expWorkspaceId}/metrics/${metricId}?api-version=${apiVersion}`;
+async function deleteMetric(input, metricId, accessToken) {
+    const url = `${getBaseUri(input)}/experiment-metrics/${metricId}?api-version=${apiVersion}`;
     const headers = {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/merge-patch+json',
@@ -46407,8 +46423,11 @@ const isValidMetricId = (metricId) => {
 };
 async function getToken() {
     const credential = new identity_1.DefaultAzureCredential();
-    const tokenResponse = await credential.getToken(`${baseUri}/.default`);
+    const tokenResponse = await credential.getToken(`${resourceUri}/.default`);
     return tokenResponse.token;
+}
+function getBaseUri(input) {
+    return `${input.expWorkspaceEndpoint}`;
 }
 function buildInvalidMetricResponse(metric) {
     return {
@@ -72234,11 +72253,11 @@ module.exports = /*#__PURE__*/JSON.parse('{"application/1d-interleaved-parityfec
 
 /***/ }),
 
-/***/ 4095:
+/***/ 7444:
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","description":"A Metric object that describes the metric.","required":["id","lifecycle","displayName","description","tags","desiredDirection","definition"],"additionalProperties":false,"properties":{"id":{"type":"string","minLength":1,"maxLength":50,"pattern":"^[a-z_][a-z0-9_]*$","description":"An ID used to uniquely identify and reference the metric.","readOnly":true},"lifecycle":{"description":"The stage in the metric lifecycle, which determines when the metric is calculated.","type":"string","enum":["Active","Inactive"]},"displayName":{"type":"string","description":"A display name for the metric to use for display rather than the ID.","minLength":1,"maxLength":200},"description":{"type":"string","description":"A description of the metric.","minLength":1,"maxLength":1000},"tags":{"type":"array","description":"The tags of the metric.","items":{"type":"string","description":"A tag attached to the metric.","minLength":1,"maxLength":30,"pattern":"^[a-zA-Z0-9 _:()&-]+$"}},"desiredDirection":{"description":"Whether an increase or decrease to the metric value is desired.","type":"string","enum":["Increase","Decrease","Neutral"]},"definition":{"$ref":"#/definitions/MetricDefinition"}},"definitions":{"EventCountDefinition":{"type":"object","description":"The definition of an EventCount metric. This metric kind counts the observations of an event. Experiment analysis accounts for unequal traffic allocation.","properties":{"kind":{"type":"string","enum":["EventCount"],"description":"The kind of metric."},"event":{"$ref":"#/definitions/ObservedEvent","description":"Event to observe."}},"required":["event"],"additionalProperties":false},"UserCountDefinition":{"type":"object","description":"The definition of a UserCount metric. This metric kind counts the users who encounter an event. Experiment analysis accounts for unequal traffic allocation.","properties":{"kind":{"type":"string","enum":["UserCount"],"description":"The kind of metric."},"event":{"$ref":"#/definitions/ObservedEvent","description":"Event to observe."}},"required":["event"],"additionalProperties":false},"EventRateDefinition":{"type":"object","required":["kind","event","condition"],"properties":{"kind":{"type":"string","enum":["EventRate"],"description":"The kind of metric."},"event":{"$ref":"#/definitions/ObservedEvent","description":"Event to observe as the rate denominator."},"condition":{"$ref":"#/definitions/EventCondition","description":"The event contributes to the rate numerator if it satisfies this condition."}},"description":"The definition of an EventRate metric. This metric kind counts the percentage of events that satisfy a condition.","additionalProperties":false},"UserRateDefinition":{"type":"object","required":["kind","startEvent","endEvent"],"properties":{"kind":{"type":"string","enum":["UserRate"],"description":"The kind of metric."},"startEvent":{"$ref":"#/definitions/ObservedEvent","description":"The start event to observe as the rate denominator."},"endEvent":{"$ref":"#/definitions/ObservedEvent","description":"The end event to observe, which is a condition for the rate numerator."}},"description":"The definition of a UserRate metric. This metric kind counts the percentage of users with the start event that then encounter the end event. The metric denominator counts the number of users who encounter the start event at least once. The metric numerator counts the number of users who encounter both the start and end events at least once. The computation is ordered, so the start event must occur before the end event.","additionalProperties":false},"PercentileDefinition":{"type":"object","required":["kind","value","percentile"],"properties":{"kind":{"type":"string","enum":["Percentile"],"description":"The kind of metric."},"value":{"$ref":"#/definitions/AggregatedValue","description":"The value to aggregate."},"percentile":{"type":"integer","format":"int32","minimum":0,"exclusiveMinimum":true,"maximum":100,"exclusiveMaximum":true,"description":"The percentile to measure."}},"description":"The definition of a Percentile metric. This metric kind measures the percentile of an event property.","additionalProperties":false},"SumDefinition":{"type":"object","required":["kind","value"],"properties":{"kind":{"type":"string","enum":["Sum"],"description":"The kind of metric."},"value":{"$ref":"#/definitions/AggregatedValue","description":"The value to aggregate."}},"description":"The definition of a Sum metric. This metric kind measures the sum of an event property. Experiment analysis accounts for unequal traffic allocation.","additionalProperties":false},"AverageDefinition":{"type":"object","required":["kind","value"],"properties":{"kind":{"type":"string","enum":["Average"],"description":"The kind of metric."},"value":{"$ref":"#/definitions/AggregatedValue","description":"The value to aggregate."}},"description":"The definition of an Average metric. This metric kind measures the average of an event property.","additionalProperties":false},"ObservedEvent":{"type":"object","description":"An event observed by a metric.","properties":{"eventName":{"type":"string","description":"The name of the event.","minLength":1,"maxLength":200},"filter":{"$ref":"#/definitions/EventCondition","description":"[Optional] A condition to filter events."}},"required":["eventName"],"additionalProperties":false},"EventCondition":{"type":"string","description":"A condition to filter events. Accepts a Kusto Query Language (KQL) filter predicate. \\nAllowed expressions evaluate to a bool data type and use a subset of KQL syntax:\\nEvent properties: plain or bracket notation.\\nLiterals: bool, long, real, string.\\nComparison operators: ==, !=, <, <=, >, >=.\\nBoolean operators: and, or.\\nGrouping operations: parentheses.","minLength":1,"maxLength":1000},"AggregatedValue":{"type":"object","required":["eventName","eventProperty"],"properties":{"eventName":{"type":"string","minLength":1,"maxLength":200,"description":"The name of the event."},"filter":{"$ref":"#/definitions/EventCondition","description":"[Optional] A condition to filter events."},"eventProperty":{"type":"string","minLength":1,"maxLength":200,"pattern":"^[a-zA-Z0-9_ -.]+$","description":"The key of the event property to aggregate."}},"description":"An event property value aggregated by a metric.","additionalProperties":false},"MetricDefinition":{"description":"The metric definition, which determines how the metric value is calculated from event data.","type":"object","properties":{"kind":{"type":"string","enum":["EventCount","UserCount","EventRate","UserRate","Sum","Average","Percentile"],"description":"Discriminator property for MetricDefinition."}},"anyOf":[{"$ref":"#/definitions/EventCountDefinition"},{"$ref":"#/definitions/UserCountDefinition"},{"$ref":"#/definitions/EventRateDefinition"},{"$ref":"#/definitions/UserRateDefinition"},{"$ref":"#/definitions/SumDefinition"},{"$ref":"#/definitions/AverageDefinition"},{"$ref":"#/definitions/PercentileDefinition"}],"required":["kind"]}}}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","description":"A Metric object that describes the metric.","required":["id","lifecycle","displayName","description","categories","desiredDirection","definition"],"additionalProperties":false,"properties":{"id":{"type":"string","minLength":1,"maxLength":50,"pattern":"^[a-z_][a-z0-9_]*$","description":"An ID used to uniquely identify and reference the metric.","readOnly":true},"lifecycle":{"description":"The stage in the metric lifecycle, which determines when the metric is calculated.","type":"string","enum":["Active","Inactive"]},"displayName":{"type":"string","description":"A display name for the metric to use for display rather than the ID.","minLength":1,"maxLength":200},"description":{"type":"string","description":"A description of the metric.","minLength":1,"maxLength":1000},"categories":{"type":"array","description":"The categories of the metric.","items":{"type":"string","description":"A tag attached to the metric.","minLength":1,"maxLength":30,"pattern":"^[a-zA-Z0-9 _:()&-]+$"}},"desiredDirection":{"description":"Whether an increase or decrease to the metric value is desired.","type":"string","enum":["Increase","Decrease","Neutral"]},"definition":{"$ref":"#/definitions/MetricDefinition"}},"definitions":{"EventCountDefinition":{"type":"object","description":"The definition of an EventCount metric. This metric type counts the observations of an event. Experiment analysis accounts for unequal traffic allocation.","properties":{"type":{"type":"string","enum":["EventCount"],"description":"The type of metric."},"event":{"$ref":"#/definitions/ObservedEvent","description":"Event to observe."}},"required":["event"],"additionalProperties":false},"UserCountDefinition":{"type":"object","description":"The definition of a UserCount metric. This metric type counts the users who encounter an event. Experiment analysis accounts for unequal traffic allocation.","properties":{"type":{"type":"string","enum":["UserCount"],"description":"The type of metric."},"event":{"$ref":"#/definitions/ObservedEvent","description":"Event to observe."}},"required":["event"],"additionalProperties":false},"EventRateDefinition":{"type":"object","required":["type","event","rateCondition"],"properties":{"type":{"type":"string","enum":["EventRate"],"description":"The type of metric."},"event":{"$ref":"#/definitions/ObservedEvent","description":"Event to observe as the rate denominator."},"rateCondition":{"$ref":"#/definitions/EventCondition","description":"The event contributes to the rate numerator if it satisfies this condition."}},"description":"The definition of an EventRate metric. This metric type counts the percentage of events that satisfy a condition.","additionalProperties":false},"UserRateDefinition":{"type":"object","required":["type","startEvent","endEvent"],"properties":{"type":{"type":"string","enum":["UserRate"],"description":"The type of metric."},"startEvent":{"$ref":"#/definitions/ObservedEvent","description":"The start event to observe as the rate denominator."},"endEvent":{"$ref":"#/definitions/ObservedEvent","description":"The end event to observe, which is a condition for the rate numerator."}},"description":"The definition of a UserRate metric. This metric type counts the percentage of users with the start event that then encounter the end event. The metric denominator counts the number of users who encounter the start event at least once. The metric numerator counts the number of users who encounter both the start and end events at least once. The computation is ordered, so the start event must occur before the end event.","additionalProperties":false},"PercentileDefinition":{"type":"object","required":["type","value","percentile"],"properties":{"type":{"type":"string","enum":["Percentile"],"description":"The type of metric."},"value":{"$ref":"#/definitions/AggregatedValue","description":"The value to aggregate."},"percentile":{"type":"integer","format":"int32","minimum":0,"exclusiveMinimum":true,"maximum":100,"exclusiveMaximum":true,"description":"The percentile to measure."}},"description":"The definition of a Percentile metric. This metric type measures the percentile of an event property.","additionalProperties":false},"SumDefinition":{"type":"object","required":["type","value"],"properties":{"type":{"type":"string","enum":["Sum"],"description":"The type of metric."},"value":{"$ref":"#/definitions/AggregatedValue","description":"The value to aggregate."}},"description":"The definition of a Sum metric. This metric type measures the sum of an event property. Experiment analysis accounts for unequal traffic allocation.","additionalProperties":false},"AverageDefinition":{"type":"object","required":["type","value"],"properties":{"type":{"type":"string","enum":["Average"],"description":"The type of metric."},"value":{"$ref":"#/definitions/AggregatedValue","description":"The value to aggregate."}},"description":"The definition of an Average metric. This metric type measures the average of an event property.","additionalProperties":false},"ObservedEvent":{"type":"object","description":"An event observed by a metric.","properties":{"eventName":{"type":"string","description":"The name of the event.","minLength":1,"maxLength":200},"filter":{"$ref":"#/definitions/EventCondition","description":"[Optional] A condition to filter events."}},"required":["eventName"],"additionalProperties":false},"EventCondition":{"type":"string","description":"A condition to filter events. Accepts a Kusto Query Language (KQL) filter predicate. \\nAllowed expressions evaluate to a bool data type and use a subset of KQL syntax:\\nEvent properties: plain or bracket notation.\\nLiterals: bool, long, real, string.\\nComparison operators: ==, !=, <, <=, >, >=.\\nBoolean operators: and, or.\\nGrouping operations: parentheses.","minLength":1,"maxLength":1000},"AggregatedValue":{"type":"object","required":["eventName","eventProperty"],"properties":{"eventName":{"type":"string","minLength":1,"maxLength":200,"description":"The name of the event."},"filter":{"$ref":"#/definitions/EventCondition","description":"[Optional] A condition to filter events."},"eventProperty":{"type":"string","minLength":1,"maxLength":200,"pattern":"^[a-zA-Z0-9_ -.]+$","description":"The key of the event property to aggregate."}},"description":"An event property value aggregated by a metric.","additionalProperties":false},"MetricDefinition":{"description":"The metric definition, which determines how the metric value is calculated from event data.","type":"object","properties":{"type":{"type":"string","enum":["EventCount","UserCount","EventRate","UserRate","Sum","Average","Percentile"],"description":"Discriminator property for MetricDefinition."}},"anyOf":[{"$ref":"#/definitions/EventCountDefinition"},{"$ref":"#/definitions/UserCountDefinition"},{"$ref":"#/definitions/EventRateDefinition"},{"$ref":"#/definitions/UserRateDefinition"},{"$ref":"#/definitions/SumDefinition"},{"$ref":"#/definitions/AverageDefinition"},{"$ref":"#/definitions/PercentileDefinition"}],"required":["type"]}}}');
 
 /***/ })
 

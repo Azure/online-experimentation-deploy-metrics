@@ -17,8 +17,8 @@ inputs:
       exclude files.'
     required: true
 
-  online-experimentation-workspace-id: # Online Experimentation workspace id
-    description: 'Online Experimentation workspace id'
+  online-experimentation-workspace-endpoint: # Online Experimentation workspace endpoint
+    description: 'Online Experimentation workspace endpoint'
     required: true
 
   operation: # Validate the configuration file only

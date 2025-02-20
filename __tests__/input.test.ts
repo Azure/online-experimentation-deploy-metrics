@@ -16,8 +16,8 @@ describe('getActionInput', () => {
   it('should return the expected input', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
-        case 'online-experimentation-workspace-id':
-          return 'workspace1'
+        case 'online-experimentation-workspace-endpoint':
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':
@@ -32,7 +32,7 @@ describe('getActionInput', () => {
     })
     const input = getActionInput()
     expect(input).toEqual({
-      expWorkspaceId: 'workspace1',
+      expWorkspaceEndpoint: 'https://workspace1.eastus2.exp.azure.net',
       configFile: 'config1',
       operationType: 'deploy',
       strictSync: false,
@@ -41,10 +41,10 @@ describe('getActionInput', () => {
     })
   })
 
-  it('should throw an error if online-experimentation-workspace-id is missing', () => {
+  it('should throw an error if online-experimentation-workspace-endpoint is missing', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
-        case 'online-experimentation-workspace-id':
+        case 'online-experimentation-workspace-endpoint':
           return ''
         case 'path':
           return 'config1'
@@ -59,15 +59,15 @@ describe('getActionInput', () => {
       }
     })
     expect(() => getActionInput()).toThrowError(
-      'Required input is missing: online-experimentation-workspace-id'
+      'Required input is missing: online-experimentation-workspace-endpoint'
     )
   })
 
   it('should throw an error if path is missing', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
-        case 'online-experimentation-workspace-id':
-          return 'workspace1'
+        case 'online-experimentation-workspace-endpoint':
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return ''
         case 'operation':
@@ -88,8 +88,8 @@ describe('getActionInput', () => {
   it('should return deploy operationType when operation is missing', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
-        case 'online-experimentation-workspace-id':
-          return 'workspace1'
+        case 'online-experimentation-workspace-endpoint':
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':
@@ -109,8 +109,8 @@ describe('getActionInput', () => {
   it('should throw an error if operation is invalid', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
-        case 'online-experimentation-workspace-id':
-          return 'workspace1'
+        case 'online-experimentation-workspace-endpoint':
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':
@@ -131,8 +131,8 @@ describe('getActionInput', () => {
   it('should return Incremental mode when mode is missing', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
-        case 'online-experimentation-workspace-id':
-          return 'workspace1'
+        case 'online-experimentation-workspace-endpoint':
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':
@@ -152,8 +152,8 @@ describe('getActionInput', () => {
   it('should throw an error if mode is invalid', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
-        case 'online-experimentation-workspace-id':
-          return 'workspace1'
+        case 'online-experimentation-workspace-endpoint':
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':
@@ -175,8 +175,8 @@ describe('getActionInput', () => {
     delete process.env.GITHUB_SHA
     getInputMock.mockImplementation(name => {
       switch (name) {
-        case 'online-experimentation-workspace-id':
-          return 'workspace1'
+        case 'online-experimentation-workspace-endpoint':
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':
@@ -199,8 +199,8 @@ describe('getActionInput', () => {
     delete process.env.GITHUB_SHA
     getInputMock.mockImplementation(name => {
       switch (name) {
-        case 'online-experimentation-workspace-id':
-          return 'workspace1'
+        case 'online-experimentation-workspace-endpoint':
+          return 'https://workspace1.eastus2.exp.azure.net'
         case 'path':
           return 'config1'
         case 'operation':

@@ -4,6 +4,7 @@
 import { ArgumentError } from './errors'
 import * as core from '@actions/core'
 import { Input } from './models'
+import exp from 'constants'
 
 export function getActionInput(): Input {
   const shouldAddCommit = getBooleanInput(
@@ -11,15 +12,33 @@ export function getActionInput(): Input {
     false
   )
   return {
-    expWorkspaceId: getRequiredInputString(
-      'online-experimentation-workspace-id'
-    ),
+    expWorkspaceEndpoint: getExpWorkspaceEndpoint(),
     configFile: getRequiredInputString('path'),
     operationType: getOperationType(),
     strictSync: getBooleanInput('strict', true),
     addCommitShaToDescription: shouldAddCommit,
     githubSha: shouldAddCommit ? getGithubSha() : ''
   }
+}
+
+function getExpWorkspaceEndpoint() {
+  let expWorkspaceEndpoint = getRequiredInputString(
+    'online-experimentation-workspace-endpoint'
+  )
+  expWorkspaceEndpoint = expWorkspaceEndpoint.trim().replace(/\/+$/, '')
+  if (!expWorkspaceEndpoint.startsWith('https://')) {
+    throw new ArgumentError(
+      'The online-experimentation-workspace-endpoint should start with https://'
+    )
+  }
+
+  if (!expWorkspaceEndpoint.endsWith('.exp.azure.net')) {
+    throw new ArgumentError(
+      'The online-experimentation-workspace-endpoint should end with .exp.azure.net'
+    )
+  }
+
+  return expWorkspaceEndpoint
 }
 
 function getGithubSha() {
