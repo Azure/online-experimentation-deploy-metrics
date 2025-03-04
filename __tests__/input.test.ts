@@ -41,6 +41,28 @@ describe('getActionInput', () => {
     })
   })
 
+  it('should show error if endpoint doesnt include exp.azure.net', () => {
+    getInputMock.mockImplementation(name => {
+      switch (name) {
+        case 'online-experimentation-workspace-endpoint':
+          return 'https://workspace1.eastus2.exp.azure-test.net'
+        case 'path':
+          return 'config1'
+        case 'operation':
+          return 'deploy'
+        case 'strict':
+          return 'false'
+        case 'add-commit-hash-to-metric-description':
+          return 'true'
+        default:
+          return ''
+      }
+    })
+    expect(() => getActionInput()).toThrowError(
+      'The online-experimentation-workspace-endpoint should include exp.azure.net'
+    )
+  })
+
   it('should throw an error if online-experimentation-workspace-endpoint is missing', () => {
     getInputMock.mockImplementation(name => {
       switch (name) {
