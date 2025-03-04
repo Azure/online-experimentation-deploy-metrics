@@ -46115,8 +46115,8 @@ function getExpWorkspaceEndpoint() {
     if (!expWorkspaceEndpoint.startsWith('https://')) {
         throw new errors_1.ArgumentError('The online-experimentation-workspace-endpoint should start with https://');
     }
-    if (!expWorkspaceEndpoint.endsWith('.exp.azure.net')) {
-        throw new errors_1.ArgumentError('The online-experimentation-workspace-endpoint should end with .exp.azure.net');
+    if (!expWorkspaceEndpoint.includes('exp.azure.net')) {
+        throw new errors_1.ArgumentError('The online-experimentation-workspace-endpoint should include exp.azure.net');
     }
     return expWorkspaceEndpoint;
 }
