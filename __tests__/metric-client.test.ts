@@ -67,7 +67,7 @@ describe('validateMetrics', () => {
     expect(axios.post).toHaveBeenCalledTimes(mockMetrics.length)
     mockMetrics.forEach(metric => {
       expect(axios.post).toHaveBeenCalledWith(
-        expect.stringContaining(metric.id),
+        expect.stringContaining('experiment-metrics:validate'),
         expect.any(Object),
         expect.any(Object)
       )
@@ -75,14 +75,6 @@ describe('validateMetrics', () => {
 
     expect(infoMock).toHaveBeenCalledWith('Metric metric1 is valid')
     expect(infoMock).toHaveBeenCalledWith('Metric metric2 is valid')
-  })
-
-  it('should throw ValidationError if any metric id regex validation fails', async () => {
-    await expect(
-      validateMetrics(mockInput, [{ id: 'abc def' }])
-    ).rejects.toThrow(ValidationError)
-
-    expect(errorMock).toHaveBeenCalled()
   })
 
   it('should throw ValidationError if server returns error', async () => {

@@ -78,12 +78,7 @@ async function validateMetric(
   metric: Metric,
   accessToken: string
 ): Promise<MetricValidationResponse> {
-  if (!isValidMetricId(metric.id)) {
-    // TODO: Remove this check once the API is fixed
-    return buildInvalidMetricValidationResponse(metric)
-  }
-
-  const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}:validate?api-version=${apiVersion}`
+  const url = `${getBaseUri(input)}/experiment-metrics:validate?api-version=${apiVersion}`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
     'Content-Type': 'application/merge-patch+json',
@@ -103,11 +98,6 @@ async function createOrUpdateMetric(
   metric: Metric,
   accessToken: string
 ): Promise<MetricResponse> {
-  if (!isValidMetricId(metric.id)) {
-    // TODO: Remove this check once the API is fixed
-    return buildInvalidMetricResponse(metric)
-  }
-
   const { githubSha, addCommitShaToDescription } = input
   const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}?api-version=${apiVersion}`
   const headers = {
@@ -248,10 +238,6 @@ function handleDeleteResult(response: ApiResponse, metricId: string): boolean {
     core.info(`Metric ${metricId} is deleted`)
   }
   return true
-}
-
-const isValidMetricId = (metricId: string) => {
-  return metricId.match(idPattern)
 }
 
 async function getToken() {

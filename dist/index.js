@@ -46296,11 +46296,7 @@ async function createOrUpdateMetrics(input, metrics) {
     core.info('Operation completed successfully');
 }
 async function validateMetric(input, metric, accessToken) {
-    if (!isValidMetricId(metric.id)) {
-        // TODO: Remove this check once the API is fixed
-        return buildInvalidMetricValidationResponse(metric);
-    }
-    const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}:validate?api-version=${apiVersion}`;
+    const url = `${getBaseUri(input)}/experiment-metrics:validate?api-version=${apiVersion}`;
     const headers = {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/merge-patch+json',
@@ -46314,10 +46310,6 @@ async function validateMetric(input, metric, accessToken) {
     };
 }
 async function createOrUpdateMetric(input, metric, accessToken) {
-    if (!isValidMetricId(metric.id)) {
-        // TODO: Remove this check once the API is fixed
-        return buildInvalidMetricResponse(metric);
-    }
     const { githubSha, addCommitShaToDescription } = input;
     const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}?api-version=${apiVersion}`;
     const headers = {
@@ -46418,9 +46410,6 @@ function handleDeleteResult(response, metricId) {
     }
     return true;
 }
-const isValidMetricId = (metricId) => {
-    return metricId.match(idPattern);
-};
 async function getToken() {
     const credential = new identity_1.DefaultAzureCredential();
     const tokenResponse = await credential.getToken(`${resourceUri}/.default`);
