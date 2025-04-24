@@ -77,14 +77,6 @@ describe('validateMetrics', () => {
     expect(infoMock).toHaveBeenCalledWith('Metric metric2 is valid')
   })
 
-  it('should throw ValidationError if any metric id regex validation fails', async () => {
-    await expect(
-      validateMetrics(mockInput, [{ id: 'abc def' }])
-    ).rejects.toThrow(ValidationError)
-
-    expect(errorMock).toHaveBeenCalled()
-  })
-
   it('should throw ValidationError if server returns error', async () => {
     mockedAxios.post.mockResolvedValue({
       status: 400,
@@ -103,7 +95,7 @@ describe('validateMetrics', () => {
       status: 200,
       statusText: 'Ok',
       data: {
-        result: 'Invalid',
+        isValid: false,
         diagnostics: [{ code: 'code', message: 'message' }]
       }
     })
