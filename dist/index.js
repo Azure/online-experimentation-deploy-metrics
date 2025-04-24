@@ -46299,7 +46299,7 @@ async function validateMetric(input, metric, accessToken) {
     const url = `${getBaseUri(input)}/experiment-metrics:validate?api-version=${apiVersion}`;
     const headers = {
         Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/merge-patch+json',
+        'Content-Type': 'application/json',
         Accept: '*/*'
     };
     const response = await axios_1.default.post(url, metric, { headers });
