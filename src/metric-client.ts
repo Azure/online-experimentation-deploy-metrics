@@ -81,7 +81,7 @@ async function validateMetric(
   const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}:validate?api-version=${apiVersion}`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
-    'Content-Type': 'application/merge-patch+json',
+    'Content-Type': 'application/json',
     Accept: '*/*'
   }
 
