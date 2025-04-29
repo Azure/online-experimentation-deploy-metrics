@@ -78,15 +78,10 @@ async function validateMetric(
   metric: Metric,
   accessToken: string
 ): Promise<MetricValidationResponse> {
-  if (!isValidMetricId(metric.id)) {
-    // TODO: Remove this check once the API is fixed
-    return buildInvalidMetricValidationResponse(metric)
-  }
-
-  const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}:validate?api-version=${apiVersion}`
+  const url = `${getBaseUri(input)}/experiment-metrics:validate?api-version=${apiVersion}`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
-    'Content-Type': 'application/merge-patch+json',
+    'Content-Type': 'application/json',
     Accept: '*/*'
   }
 
@@ -103,11 +98,6 @@ async function createOrUpdateMetric(
   metric: Metric,
   accessToken: string
 ): Promise<MetricResponse> {
-  if (!isValidMetricId(metric.id)) {
-    // TODO: Remove this check once the API is fixed
-    return buildInvalidMetricResponse(metric)
-  }
-
   const { githubSha, addCommitShaToDescription } = input
   const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}?api-version=${apiVersion}`
   const headers = {
@@ -212,7 +202,7 @@ function handleValidationResult(
       `Failed to validate metric ${metric.id}: ${response.statusText}. Status: ${response.status}. Message: ${JSON.stringify(response.data)}`
     )
     return false
-  } else if (response.data.result !== 'Valid') {
+  } else if (response.data.isValid === false) {
     core.error(
       `Metric validation failed for ${metric.id}: ${response.statusText}. Message: ${JSON.stringify(response.data)}`
     )
@@ -250,10 +240,6 @@ function handleDeleteResult(response: ApiResponse, metricId: string): boolean {
   return true
 }
 
-const isValidMetricId = (metricId: string) => {
-  return metricId.match(idPattern)
-}
-
 async function getToken() {
   const credential = new DefaultAzureCredential()
   const tokenResponse = await credential.getToken(`${resourceUri}/.default`)
@@ -279,7 +265,7 @@ function buildInvalidMetricValidationResponse(
     status: 200,
     statusText: 'Ok',
     data: {
-      result: 'Invalid',
+      isValid: false,
       diagnostics: [
         {
           message: `Invalid metric id: ${metric.id}, it should match ${idPattern}`,

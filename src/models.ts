@@ -39,7 +39,7 @@ export interface MetricResponse extends ApiResponse {
 }
 
 export interface MetricValidationResult {
-  result: string
+  isValid: boolean
   diagnostics: MetricDiagnostic[]
 }
 
