@@ -78,7 +78,7 @@ async function validateMetric(
   metric: Metric,
   accessToken: string
 ): Promise<MetricValidationResponse> {
-  const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}:validate?api-version=${apiVersion}`
+  const url = `${getBaseUri(input)}/experiment-metrics:validate?api-version=${apiVersion}`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
     'Content-Type': 'application/json',

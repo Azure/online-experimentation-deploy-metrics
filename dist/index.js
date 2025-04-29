@@ -46296,7 +46296,7 @@ async function createOrUpdateMetrics(input, metrics) {
     core.info('Operation completed successfully');
 }
 async function validateMetric(input, metric, accessToken) {
-    const url = `${getBaseUri(input)}/experiment-metrics/${metric.id}:validate?api-version=${apiVersion}`;
+    const url = `${getBaseUri(input)}/experiment-metrics:validate?api-version=${apiVersion}`;
     const headers = {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',

@@ -67,7 +67,7 @@ describe('validateMetrics', () => {
     expect(axios.post).toHaveBeenCalledTimes(mockMetrics.length)
     mockMetrics.forEach(metric => {
       expect(axios.post).toHaveBeenCalledWith(
-        expect.stringContaining(metric.id),
+        expect.stringContaining('experiment-metrics:validate'),
         expect.any(Object),
         expect.any(Object)
       )
