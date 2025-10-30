@@ -46411,7 +46411,7 @@ function handleDeleteResult(response, metricId) {
     return true;
 }
 async function getToken() {
-    const credential = new identity_1.DefaultAzureCredential();
+    const credential = new identity_1.DefaultAzureCredential(); // CodeQL [SM05138] GitHub Actions will run in a clean environment each time, no one can inject malicious credentials.
     const tokenResponse = await credential.getToken(`${resourceUri}/.default`);
     return tokenResponse.token;
 }
